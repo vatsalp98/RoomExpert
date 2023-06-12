@@ -1,4 +1,4 @@
-import {InboxOutlined } from "@ant-design/icons";
+import {DownloadOutlined, InboxOutlined, RedoOutlined, StarTwoTone} from "@ant-design/icons";
 import {
   Upload,
   message,
@@ -13,7 +13,8 @@ import { useState } from "react";
 import Image from "next/image";
 import {api} from "~/utils/api";
 import { LoadingSpinner } from "~/components/loadingPage";
-import {client} from "~/utils/utils";
+import downloadFile, {client} from "~/utils/utils";
+import {useRouter} from "next/router";
 
 
 const { Dragger } = Upload;
@@ -76,6 +77,7 @@ export default function DashboardPage() {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
   const [roomType, setRoomType] = useState('bedroom');
   const [roomTheme, setRoomTheme] = useState('modern');
 
@@ -120,6 +122,7 @@ export default function DashboardPage() {
   };
 
   const handleGenerate = () => {
+    // console.log(roomType, roomTheme);
     generateImage({
       image_url: previewImage,
       room: roomType,
@@ -172,10 +175,10 @@ export default function DashboardPage() {
                           allowClear
                           style={{ width: '100%' }}
                           placeholder="Please select"
-                          defaultValue={['modern']}
+                          defaultValue={'modern'}
                           options={optionsRoomThemes}
-                          onChange={(value) => {
-                            setRoomTheme(value[0] as string);
+                          onChange={(value: string) => {
+                            setRoomTheme(value);
                           }}
                       />
                     </div>
@@ -190,10 +193,10 @@ export default function DashboardPage() {
                           allowClear
                           style={{ width: '100%' }}
                           placeholder="Please select"
-                          defaultValue={['bedroom']}
+                          defaultValue={'bedroom'}
                           options={optionsRoomType}
-                          onChange={(value) => {
-                            setRoomType(value[0] as string);
+                          onChange={(value: string) => {
+                            setRoomType(value);
                           }}
                       />
                     </div>
@@ -245,6 +248,20 @@ export default function DashboardPage() {
                         Generated Image
                       </p>
                       <Image alt={"generated Image"} src={generatedImage} width={500} height={500}/>
+                    </div>
+                  </div>
+                  <div className="space-y-4 w-full max-w-sm">
+                    <div className="flex flex-row mt-3 items-center space-x-3 justify-center">
+                      <Button type={"primary"} icon={<DownloadOutlined/>} onClick={() => {
+                        downloadFile(generatedImage);
+                      }}>
+                        Download
+                      </Button>
+                      <Button type={"primary"} icon={<RedoOutlined />} onClick={() => {
+                        router.reload();
+                      }}>
+                        Restart
+                      </Button>
                     </div>
                   </div>
                 </div>

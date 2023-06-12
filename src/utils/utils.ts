@@ -10,3 +10,17 @@ export const getBase64 = (file: RcFile): Promise<string> =>
     });
 
 export const client = new Client().setEndpoint(process.env.NEXT_PUBLIC_ENDPOINT as string).setProject(process.env.NEXT_PUBLIC_PROJECT_ID as string);
+
+const downloadFile = (url: string) => {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = <string>url.split('/').pop();
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+    anchor.click();
+
+    // Clean up the dynamically created anchor element
+    anchor.remove();
+};
+
+export default downloadFile;

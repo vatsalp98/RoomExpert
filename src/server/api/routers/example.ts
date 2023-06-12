@@ -29,7 +29,7 @@ export const exampleRouter = createTRPCRouter({
 
     listFiles: appWriteProcedure.query(async ({ctx }) => {
         try {
-            return await ctx.sdk.storage.listFiles(env.BUCKET_ID );
+            return await ctx.sdk.storage.listFiles(process.env.NEXT_PUBLIC_BUCKET_ID as string);
         } catch (error){
             throw new TRPCError({code:  "INTERNAL_SERVER_ERROR", message: `something went Wrong`})
         }
@@ -67,6 +67,7 @@ export const exampleRouter = createTRPCRouter({
             room: z.string(),
         })
     ).mutation(async ({ input}) => {
+        console.log(input.theme, input.room);
         const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
             method: "POST",
             headers: {
@@ -74,8 +75,7 @@ export const exampleRouter = createTRPCRouter({
                 Authorization: `Token ${process.env.REPLICATE_API_KEY ?? ""}`,
             },
             body: JSON.stringify({
-                version:
-                    "854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b",
+                version: process.env.REPLICATE_MODEL_VERSION,
                 input: {
                     image: input.image_url,
                     prompt:
