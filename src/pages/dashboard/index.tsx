@@ -10,7 +10,6 @@ import type { RcFile } from "antd/es/upload";
 import { Client, ID, Storage } from "appwrite";
 import Head from "next/head";
 import { useState } from "react";
-import { appwrite_config } from "../config";
 import Image from "next/image";
 import {api} from "~/utils/api";
 import { LoadingSpinner } from "~/components/loadingPage";
@@ -72,8 +71,8 @@ const optionsRoomThemes: SelectProps['options'] = [
 export default function DashboardPage() {
 
   const client = new Client()
-    .setEndpoint(appwrite_config.endpoint)
-    .setProject(appwrite_config.projectId);
+    .setEndpoint(process.env.ENDPOINT as string)
+    .setProject(process.env.PROJECT_ID as string);
   const storage = new Storage(client);
   const [previewImage, setPreviewImage] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
@@ -105,7 +104,7 @@ export default function DashboardPage() {
 
   const handleUpload = () => {
     const promise = storage.createFile(
-      appwrite_config.bucked_id,
+      process.env.BUCKET_ID as string,
       ID.unique(),
       fileList[0] as RcFile
     );

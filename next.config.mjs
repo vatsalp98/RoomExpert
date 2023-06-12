@@ -23,9 +23,5 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
-  env: {
-    BUCKET_ID: "6485acff9eb635595eef",
-    PROJECT_ID: "6482fe1170f8613388e3",
-  }
 };
 export default config;
