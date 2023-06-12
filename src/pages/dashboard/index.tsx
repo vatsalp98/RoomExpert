@@ -7,12 +7,13 @@ import {
   Button, type  SelectProps, Select,
 } from "antd";
 import type { RcFile } from "antd/es/upload";
-import { Client, ID, Storage } from "appwrite";
+import { ID, Storage } from "appwrite";
 import Head from "next/head";
 import { useState } from "react";
 import Image from "next/image";
 import {api} from "~/utils/api";
 import { LoadingSpinner } from "~/components/loadingPage";
+import {client} from "~/utils/utils";
 
 
 const { Dragger } = Upload;
@@ -20,27 +21,27 @@ const { Dragger } = Upload;
 const optionsRoomType: SelectProps['options'] = [
   {
     label: "Gaming Room",
-    value: "gaming_chair",
+    value: "Gaming Room",
   },
   {
     label: "Living Room",
-    value: "living_room",
+    value: "Living Room",
   },
   {
     label: "Dining Room",
-    value: "dining_room",
+    value: "Dining Room",
   },
   {
     label: "Bedroom",
-    value: "bedroom",
+    value: "Bedroom",
   },
   {
     label: "Bathroom",
-    value: "bathroom",
+    value: "Bathroom",
   },
   {
     label:  "Office",
-    value: "office",
+    value: "Office",
   }
 ];
 
@@ -69,14 +70,11 @@ const optionsRoomThemes: SelectProps['options'] = [
 
 
 export default function DashboardPage() {
-
-  const client = new Client()
-    .setEndpoint(process.env.ENDPOINT as string)
-    .setProject(process.env.PROJECT_ID as string);
   const storage = new Storage(client);
   const [previewImage, setPreviewImage] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [roomType, setRoomType] = useState('bedroom');
   const [roomTheme, setRoomTheme] = useState('modern');
@@ -103,21 +101,22 @@ export default function DashboardPage() {
 
 
   const handleUpload = () => {
+    setLoading(true);
     const promise = storage.createFile(
-      process.env.BUCKET_ID as string,
+      process.env.NEXT_PUBLIC_BUCKET_ID as string,
       ID.unique(),
       fileList[0] as RcFile
     );
 
     promise.then( function (response) {
-      const filePromise = storage.getFilePreview(process.env.BUCKET_ID as string, response.$id);
+      const filePromise = storage.getFilePreview(process.env.NEXT_PUBLIC_BUCKET_ID as string, response.$id);
       setPreviewImage(filePromise.toString());
+      setLoading(false);
     }, function (error) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
       void messageApi.error(error.message);
+      setLoading(false);
     })
-
-
   };
 
   const handleGenerate = () => {
@@ -217,7 +216,7 @@ export default function DashboardPage() {
                   {
                       !previewImage && <div className={"mt-4 w-full max-w-sm"}>
                         <div className="flex flex-col mt-6 w-96 items-center space-x-3">
-                          <Button type={"default"} className={"text-white"} onClick={handleUpload}>
+                          <Button type={"default"} className={"text-white"} onClick={handleUpload} loading={loading}>
                             Upload
                           </Button>
                         </div>
@@ -226,7 +225,7 @@ export default function DashboardPage() {
                   {
                       !!previewImage && <div className={"mt-4 w-full max-w-sm"}>
                         <div className="flex flex-col mt-6 w-96 items-center space-x-3">
-                          <Button type={"default"} className={"text-white"} onClick={handleGenerate}>
+                          <Button type={"default"} className={"text-white"} onClick={handleGenerate} loading={generateLoading}>
                             Generate
                           </Button>
                         </div>

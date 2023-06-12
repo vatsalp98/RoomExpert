@@ -1,14 +1,12 @@
 import { Button, Form, Input, message } from "antd";
 import Head from "next/head";
 import Link from "next/link";
-import { Client, Account } from "appwrite";
+import { Account } from "appwrite";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import {client} from "~/utils/utils";
 
 export default function SigninPage() {
-  const client = new Client()
-    .setEndpoint(process.env.ENDPOINT as string)
-    .setProject(process.env.PROJECT_ID as string);
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const router = useRouter();

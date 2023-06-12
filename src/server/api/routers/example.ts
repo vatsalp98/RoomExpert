@@ -39,14 +39,8 @@ export const exampleRouter = createTRPCRouter({
         z.object({
             file_id: z.string(),
         })
-    ).query(({ctx, input}) => {
-        const promise = ctx.sdk.storage.getFilePreview(env.BUCKET_ID, input.file_id);
-        promise.then(function (response) {
-            return response;
-        }, function (error) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-            if(error) throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: error.message})
-        });
+    ).query(async ({ctx, input}) => {
+        return await ctx.sdk.storage.getFilePreview(env.BUCKET_ID, input.file_id);
     }),
 
     createFile: appWriteProcedure.input(
