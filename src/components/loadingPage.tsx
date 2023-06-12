@@ -5,7 +5,7 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const LoadingSpinner = () => {
   return (
     <div role="status">
-        <Spin indicator={antIcon} size={"large"}/>
+        <Spin indicator={antIcon} size={"large"} className={"text-4xl"}/>
     </div>
   );
 };

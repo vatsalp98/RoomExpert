@@ -1,10 +1,10 @@
-import {DownloadOutlined, InboxOutlined, RedoOutlined, StarTwoTone} from "@ant-design/icons";
+import {DownloadOutlined, InboxOutlined, PictureOutlined, RedoOutlined, StarTwoTone} from "@ant-design/icons";
 import {
   Upload,
   message,
   type UploadFile,
   type UploadProps,
-  Button, type  SelectProps, Select,
+  Button, type  SelectProps, Select, Divider,
 } from "antd";
 import type { RcFile } from "antd/es/upload";
 import { ID, Storage } from "appwrite";
@@ -13,8 +13,12 @@ import { useState } from "react";
 import Image from "next/image";
 import {api} from "~/utils/api";
 import { LoadingSpinner } from "~/components/loadingPage";
-import downloadFile, {client} from "~/utils/utils";
+import downloadFile, {appendNewToName, client} from "~/utils/utils";
 import {useRouter} from "next/router";
+import downloadPhoto from "~/utils/utils";
+import Empty from "antd/es/empty/empty";
+import Header from "~/components/header";
+import Footer from "~/components/footer";
 
 
 const { Dragger } = Upload;
@@ -158,14 +162,15 @@ export default function DashboardPage() {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className={"flex max-w-6xl mx-auto flex-col items-center justify-center py-2 min-h-screen bg-[#17181C] text-white"}>
+      <div className={"flex max-w-screen mx-auto flex-col items-center justify-center py-2 min-h-screen bg-[#17181C] text-white"}>
+        <Header />
         <main className={"flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-4 sm:mb-0 mb-8"}>
           <h1 className="mx-auto max-w-4xl font-display text-4xl font-bold tracking-normal text-slate-100 sm:text-6xl mb-5">
             Generate your <span className="text-blue-600">dream</span> room
           </h1>
-          <div className={"relative w-full overflow-hidden inset-x-0"}>
-            {
-              !generatedImage && !generateLoading && <div className={"flex justify-between items-center w-full flex-col mt-4"}>
+          <div className={"relative w-full overflow-hidden inset-x-0 flex flex-row"}>
+            <div className={"flex justify-between items-center w-full flex-col mt-4"}>
+              <div className={"justify-center pl-20"}>
                   <div className="space-y-4 w-full max-w-sm">
                     <div className="flex flex-col mt-3 items-center space-x-3">
                       <p className="text-center mb-6 font-medium ">
@@ -173,9 +178,10 @@ export default function DashboardPage() {
                       </p>
                       <Select
                           allowClear
-                          style={{ width: '100%' }}
+                          style={{ width: '100%', color: "black" }}
                           placeholder="Please select"
                           defaultValue={'modern'}
+                          className={"text-black"}
                           options={optionsRoomThemes}
                           onChange={(value: string) => {
                             setRoomTheme(value);
@@ -212,8 +218,8 @@ export default function DashboardPage() {
                           {fileList.length >= 1 ? null : uploadButton}
                         </Dragger>
                       </div>
-                    </div> : <div className={"border rounded-lg p-5 mt-6"}>
-                      <Image src={previewImage} alt={"Uploaded Photo"} width={200} height={200}/>
+                    </div> : <div className={"border flex rounded-lg p-5 mt-6 justify-center"}>
+                      <Image src={previewImage} alt={"Uploaded Photo"} width={300} height={300}/>
                     </div>
                   }
                   {
@@ -228,7 +234,7 @@ export default function DashboardPage() {
                   {
                       !!previewImage && <div className={"mt-4 w-full max-w-sm"}>
                         <div className="flex flex-col mt-6 w-96 items-center space-x-3">
-                          <Button type={"default"} className={"text-white"} onClick={handleGenerate} loading={generateLoading}>
+                          <Button type={"default"} className={"text-white"} onClick={handleGenerate}>
                             Generate
                           </Button>
                         </div>
@@ -236,39 +242,54 @@ export default function DashboardPage() {
                   }
 
                 </div>
-            }
-            {
-              generateLoading && <div className={"p-10"}><LoadingSpinner /></div>
-            }
-            {
-                !!generatedImage && <div className={"flex justify-between items-center w-full flex-col mt-4"}>
-                  <div className="space-y-4 w-full max-w-sm">
-                    <div className="flex flex-col mt-3 items-center space-x-3">
-                      <p className="text-center mb-6 font-medium ">
-                        Generated Image
-                      </p>
-                      <Image alt={"generated Image"} src={generatedImage} width={500} height={500}/>
-                    </div>
-                  </div>
-                  <div className="space-y-4 w-full max-w-sm">
-                    <div className="flex flex-row mt-3 items-center space-x-3 justify-center">
-                      <Button type={"primary"} icon={<DownloadOutlined/>} onClick={() => {
-                        downloadFile(generatedImage);
-                      }}>
-                        Download
-                      </Button>
-                      <Button type={"primary"} icon={<RedoOutlined />} onClick={() => {
-                        router.reload();
-                      }}>
-                        Restart
-                      </Button>
-                    </div>
-                  </div>
+            </div>
+            <div className={"flex justify-between items-center w-full flex-col mt-4"}>
+              <div className="space-y-4 w-full max-w-sm">
+                <div className="flex flex-col mt-3 items-center space-x-3">
+                  <p className="text-center mb-6 font-medium ">
+                    Generated Image
+                  </p>
+                  {
+                    generateLoading && <div className={"border rounded-lg p-10"}>
+                        <LoadingSpinner />
+                      </div>
+                  }
+                  {!generateLoading && !generatedImage && <div className={"border rounded-lg p-10"}>
+                          <PictureOutlined className={"text-5xl"}/>
+                          <p className={"pt-2 font-semibold "}>
+                            Generate your dream room design!
+                          </p>
+                      </div>
+                  }
+                  {
+                    generatedImage && <div className={"border rounded-lg p-10"}><Image alt={"generated Image"} src={generatedImage} width={500} height={500} /></div>
+                  }
                 </div>
-            }
+              </div>
+              {
+                  !!generatedImage && <div className={"flex justify-between items-center w-full flex-col mt-4"}>
+                    <div className="space-y-4 w-full max-w-sm">
+                      <div className="flex flex-row mt-3 items-center space-x-3 justify-center">
+                        <Button type={"primary"} icon={<DownloadOutlined/>} onClick={() => {
+                          downloadPhoto(generatedImage, appendNewToName("generated_room.png"));
+                        }}>
+                          Download
+                        </Button>
+                        <Button type={"primary"} icon={<RedoOutlined />} onClick={() => {
+                          setPreviewImage("");
+                          setFileList([]);
+                        }}>
+                          Restart
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+              }
+
+            </div>
           </div>
         </main>
-
+      <Footer />
       </div>
     </>
   );

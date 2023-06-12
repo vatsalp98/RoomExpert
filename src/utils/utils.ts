@@ -11,16 +11,33 @@ export const getBase64 = (file: RcFile): Promise<string> =>
 
 export const client = new Client().setEndpoint(process.env.NEXT_PUBLIC_ENDPOINT as string).setProject(process.env.NEXT_PUBLIC_PROJECT_ID as string);
 
-const downloadFile = (url: string) => {
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = <string>url.split('/').pop();
-    anchor.target = '_blank';
-    anchor.rel = 'noopener noreferrer';
-    anchor.click();
+function forceDownload(blobUrl: string, filename: string) {
+    const a  = document.createElement("a");
+    a.download = filename;
+    a.href = blobUrl;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
 
-    // Clean up the dynamically created anchor element
-    anchor.remove();
-};
+export default function downloadPhoto(url: string, filename: string) {
+    fetch(url, {
+        headers: new Headers({
+            Origin: location.origin,
+        }),
+        mode: "cors",
+    })
+        .then((response) => response.blob())
+        .then((blob) => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            forceDownload(blobUrl, filename);
+        })
+        .catch((e) => console.error(e));
+}
 
-export default downloadFile;
+export function appendNewToName(name: string) {
+    const insertPos = name.indexOf(".");
+    return name
+        .substring(0, insertPos)
+        .concat("-new", name.substring(insertPos));
+}

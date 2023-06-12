@@ -8,7 +8,8 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: "#2e026d",
+            colorPrimary: "#003BA1",
+            colorText: "#000000",
         },
       }}
     >

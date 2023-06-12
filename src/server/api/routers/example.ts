@@ -59,6 +59,10 @@ export const exampleRouter = createTRPCRouter({
         }
     }),
 
+    getAccount: appWriteProcedure.query(async ({ctx}) => {
+        return await ctx.sdk.account.get();
+    }),
+
     generate: appWriteProcedure.input(
         z.object({
             user_id: z.string(),
