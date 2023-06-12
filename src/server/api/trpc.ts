@@ -11,7 +11,7 @@ import { TRPCError, initTRPC } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { Client, Account, Databases, Users } from "node-appwrite";
+import { Client, Account, Databases, Users, Storage } from "node-appwrite";
 
 /**
  * 1. CONTEXT
@@ -44,12 +44,14 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   const account = new Account(client);
   const database = new Databases(client);
   const users = new Users(client);
+  const storage = new Storage(client);
 
   return {
     sdk: {
       account,
       database,
       users,
+      storage,
     },
   };
 };
@@ -98,6 +100,7 @@ const isAuthed = t.middleware(({ next, ctx }) => {
       account: ctx.sdk.account,
       database: ctx.sdk.database,
       users: ctx.sdk.users,
+      storage: ctx.sdk.storage,
     },
   });
 });
