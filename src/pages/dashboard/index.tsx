@@ -4,7 +4,7 @@ import {
   message,
   type UploadFile,
   type UploadProps,
-  Button, type  SelectProps, Select, Spin,
+  Button, type  SelectProps, Select,
 } from "antd";
 import type { RcFile } from "antd/es/upload";
 import { Client, ID, Storage } from "appwrite";
@@ -13,7 +13,7 @@ import { useState } from "react";
 import { appwrite_config } from "../config";
 import Image from "next/image";
 import {api} from "~/utils/api";
-import {LoadingPage, LoadingSpinner} from "~/components/loadingPage";
+import { LoadingSpinner } from "~/components/loadingPage";
 
 
 const { Dragger } = Upload;
@@ -79,14 +79,11 @@ export default function DashboardPage() {
   const [messageApi, contextHolder] = message.useMessage();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
-  const { mutate: createFile, isLoading, data, error } = api.example.createFile.useMutation();
   const [roomType, setRoomType] = useState('bedroom');
   const [roomTheme, setRoomTheme] = useState('modern');
 
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewTitle, setPreviewTitle] = useState('');
 
-  const { mutate: generateImage, isLoading: generateLoading, isSuccess: generateSuccess, data: generatedImage} = api.example.generate.useMutation();
+  const { mutate: generateImage, isLoading: generateLoading, data: generatedImage} = api.example.generate.useMutation();
 
   const props: UploadProps = {
     name: "file",
@@ -147,14 +144,6 @@ export default function DashboardPage() {
         </p>
       </div>
   );
-
-  if(error) {
-    void messageApi.error(error.message);
-  }
-
-  if(isLoading) {
-    return <LoadingPage />;
-  }
 
 
   return (

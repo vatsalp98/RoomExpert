@@ -1,7 +1,7 @@
 import { Button, Form, Input, message } from "antd";
 import Head from "next/head";
 import Link from "next/link";
-import { Client, Account, ID } from "appwrite";
+import { Client, Account } from "appwrite";
 import { appwrite_config } from "../config";
 import { useRouter } from "next/router";
 import { useState } from "react";

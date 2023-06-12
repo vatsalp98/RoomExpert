@@ -1,10 +1,9 @@
 import {ID} from "node-appwrite";
 import {z} from "zod";
 import {appWriteProcedure, createTRPCRouter} from "~/server/api/trpc";
-import {NextResponse} from "next/server";
 import {env} from "~/env.mjs";
 import {TRPCError} from "@trpc/server";
-import {RcFile} from "antd/es/upload";
+import type {RcFile} from "antd/es/upload";
 
 export const exampleRouter = createTRPCRouter({
   createAccount: appWriteProcedure
@@ -73,7 +72,7 @@ export const exampleRouter = createTRPCRouter({
             theme:  z.string(),
             room: z.string(),
         })
-    ).mutation(async ({ctx, input}) => {
+    ).mutation(async ({ input}) => {
         const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
             method: "POST",
             headers: {
