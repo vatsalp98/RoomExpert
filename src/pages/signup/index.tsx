@@ -1,10 +1,13 @@
+import { ArrowLeftOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message } from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { api } from "~/utils/api";
 
 export default function SignupPage() {
+  const [loading, setLoading] = useState(false);
   const {
     mutate: createAccount,
     error,
@@ -36,105 +39,102 @@ export default function SignupPage() {
   }
 
   return (
-    <>
-      {contextHolder}
-      <Head>
-        <title>RoomExpert | Signup</title>
-        <meta
-          name="description"
-          content="Welcome to the best room decorator ever."
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-[#17181C] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 rounded-lg bg-white/20 px-4 py-16">
-          <div>
-            <Link href={"/"}>Home</Link>
-          </div>
-          <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-            <span className="text-[hsl(280,100%,70%)]">Signup Form</span>
-          </h1>
-          <div className="text-white ">
-            <Form
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-              autoComplete="off"
-              onFinish={handleSignup}
-              onFinishFailed={handleCancel}
-              style={{
-                color: "white",
-              }}
-            >
-              <Form.Item
-                label="Email"
-                name={"email"}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your Email!",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                label="Name"
-                name={"name"}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your name!",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                label="Phone Number"
-                name={"phone"}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your Phone Number!",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                ]}
-              >
-                <Input.Password />
-              </Form.Item>
-              <Form.Item
-                wrapperCol={{
-                  offset: 10,
-                  span: 16,
-                }}
-              >
-                <Button
-                  type="text"
-                  htmlType="submit"
+      <>
+        {contextHolder}
+        <Head>
+          <title>RoomExpert | Signup</title>
+          <meta
+              name="description"
+              content="Welcome to the best room decorator ever."
+          />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <main className="flex min-h-screen bg-[#17181C] items-center justify-center font-poppins">
+          <div className="p-10 bg-white backdrop-blur-md bg-white bg-opacity-20 rounded-lg shadow-lg max-w-xl w-full text-white space-y-8">
+            <div className="flex justify-start">
+              <Link href={"/"}><ArrowLeftOutlined/></Link>
+            </div>
+            <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+              <span className="text-[h#ffffff]">Signup Form</span>
+            </h1>
+            <div className="text-white ">
+              <Form
+                  labelCol={{ span: 8 }}
+                  wrapperCol={{ span: 16 }}
+                  autoComplete="off"
+                  onFinish={handleSignup}
+                  onFinishFailed={handleCancel}
                   style={{
-                    fontWeight: "bold",
-                    fontSize: 16,
                     color: "white",
                   }}
+              >
+                <Form.Item
+                    label={<span className="text-[#ffffff] font-poppins">Email</span>}
+                    name={"email"}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your Email!",
+                      },
+                    ]}
                 >
-                  Signup
-                </Button>
-              </Form.Item>
-            </Form>
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                    label={<span className="text-[#ffffff] font-poppins">Name</span>}
+                    name={"name"}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your name!",
+                      },
+                    ]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                    label={<span className="text-[#ffffff] font-poppins">Phone</span>}
+                    name={"phone"}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your Phone Number!",
+                      },
+                    ]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                    label={<span className="text-[#ffffff] font-poppins">Password</span>}
+                    name="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your password!",
+                      },
+                    ]}
+                >
+                  <Input.Password />
+                </Form.Item>
+                <Form.Item
+                    wrapperCol={{
+                      offset: 10,
+                      span: 16,
+                    }}
+                >
+                  <Button
+                      type="primary"
+                      htmlType="submit"
+                      className={`px-8 pb-8 rounded text-lg font-bold ${loading ? 'opacity-50' : ''}`}
+                      disabled={loading}
+                  >
+                    {loading ? <LoadingOutlined spin /> : 'Sign up'}
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
           </div>
-        </div>
-      </main>
-    </>
+        </main>
+      </>
   );
 }
