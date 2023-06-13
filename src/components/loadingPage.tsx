@@ -1,19 +1,21 @@
 import {LoadingOutlined} from "@ant-design/icons";
 import {Spin} from "antd";
 
-const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-export const LoadingSpinner = () => {
-  return (
-    <div role="status">
-        <Spin indicator={antIcon} size={"large"} className={"text-4xl"}/>
-    </div>
-  );
+export const LoadingSpinner = (props: {
+    size?: number,
+}) => {
+    const antIcon = <LoadingOutlined style={{fontSize: props.size ?? 64, color: "white"}} spin/>;
+    return (
+        <div className={"status"}>
+            <Spin indicator={antIcon}/>
+        </div>
+    );
 };
 
 export const LoadingPage = () => {
-  return (
-    <div className="absolute right-0 top-0 flex h-screen w-screen items-center justify-center align-middle">
-      <LoadingSpinner />
-    </div>
-  );
+    return (
+        <div className="absolute right-0 top-0 flex h-screen w-screen items-center justify-center align-middle">
+            <LoadingSpinner/>
+        </div>
+    );
 };

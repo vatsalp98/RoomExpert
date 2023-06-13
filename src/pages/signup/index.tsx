@@ -1,140 +1,205 @@
-import { ArrowLeftOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message } from "antd";
+import {ArrowLeftOutlined} from "@ant-design/icons";
+import {Button, Form, Input, message} from "antd";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { api } from "~/utils/api";
+import {useRouter} from "next/router";
+import {api} from "~/utils/api";
+import Header from "~/components/header";
+import Footer from "~/components/footer";
+import {FetchState, useGetUser} from "~/utils/hooks/useGetUser";
+import {LoadingSpinner} from "~/components/loadingPage";
 
 export default function SignupPage() {
-  const [loading, setLoading] = useState(false);
-  const {
-    mutate: createAccount,
-    error,
-    isSuccess,
-  } = api.example.createAccount.useMutation();
-  const [messageApi, contextHolder] = message.useMessage();
-  const router = useRouter();
-  const handleSignup = (values: {
-    email: string;
-    name: string;
-    password: string;
-    phone: string;
-  }) => {
-    setLoading(true);
-    return createAccount({
-      email: values.email,
-      name: values.name,
-      password: values.password,
-      phone: values.phone,
-    });
-  };
+    const {
+        mutate: createAccount,
+        error,
+        isSuccess,
+        data: account_payload,
+    } = api.example.createAccount.useMutation();
+    const [messageApi, contextHolder] = message.useMessage();
+    const router = useRouter();
+    const [{user, isLoading, isError}, dispatch] = useGetUser();
 
-  const handleCancel = () => {
-    if (error) void messageApi.error(error.message);
-  };
+    const {
+        mutate: listUsers,
+        data: user_count,
+        isSuccess: user_count_success,
+    } = api.example.listUsers.useMutation();
+    const handleSignup = (values: {
+        email: string;
+        name: string;
+        password: string;
+        phone: string;
+    }) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        dispatch({type: FetchState.FETCH_INIT});
+        return createAccount({
+            email: values.email,
+            name: values.name,
+            password: values.password,
+            phone: values.phone,
+        });
+    };
 
-  if (isSuccess) {
-    void router.push("/dashboard");
-  }
+    const handleCancel = () => {
+        if (error) void messageApi.error(error.message);
+    };
 
-  return (
-      <>
-        {contextHolder}
-        <Head>
-          <title>RoomExpert | Signup</title>
-          <meta
-              name="description"
-              content="Welcome to the best room decorator ever."
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <main className="flex min-h-screen bg-[#17181C] items-center justify-center font-poppins">
-          <div className="p-10 bg-white backdrop-blur-md bg-white bg-opacity-20 rounded-lg shadow-lg max-w-xl w-full text-white space-y-8">
-            <div className="flex justify-start">
-              <Link href={"/"}><ArrowLeftOutlined/></Link>
+    if (isSuccess) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        dispatch({type: FetchState.FETCH_SUCCESS, data: account_payload});
+        void messageApi.success("Account successfully created, You can now Login!");
+        void router.push("/signin");
+    }
+
+    if (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        dispatch({type: FetchState.FETCH_FAILURE});
+        void messageApi.error(error.message);
+    }
+
+    return (
+        <>
+            {contextHolder}
+            <Head>
+                <title>RoomExpert | Signup</title>
+                <meta
+                    name="description"
+                    content="Welcome to the best room decorator ever."
+                />
+                <link rel="icon" href="/favicon.ico"/>
+            </Head>
+            <div
+                className={"flex max-w-screen flex-col items-center justify-center py-2 min-h-screen bg-[#17181C] text-white"}>
+                <Header/>
+                <main className="flex w-[550px] min-h-screen bg-[#17181C] items-center justify-center font-poppins">
+                    <div
+                        className="p-10 bg-white backdrop-blur-md bg-opacity-20 rounded-lg shadow-lg max-w-xl w-full text-white space-y-8">
+                        <div className="flex justify-start">
+                            <Link href={"/"}><ArrowLeftOutlined/></Link>
+                        </div>
+                        <h2 className="text-5xl py-5 font-extrabold tracking-tight text-white text-center">
+                            <span className="text-blue-600">Signup </span>Form
+                        </h2>
+                        {
+                            !isLoading && <div className="text-white pt-5">
+                                <Form
+                                    labelCol={{span: 6}}
+                                    wrapperCol={{span: 16}}
+                                    autoComplete="off"
+                                    onFinish={handleSignup}
+                                    onFinishFailed={handleCancel}
+                                    style={{
+                                        color: "white",
+                                    }}
+                                >
+                                    <Form.Item
+                                        label={<span className="text-[#ffffff] font-poppins">Email</span>}
+                                        name={"email"}
+                                        hasFeedback={true}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: "Please input your Email!",
+                                            },
+                                        ]}
+                                    >
+                                        <Input placeholder={"Email Address"}/>
+                                    </Form.Item>
+                                    <Form.Item
+                                        label={<span className="text-[#ffffff] font-poppins">Name</span>}
+                                        name={"name"}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: "Please input your name!",
+                                            },
+                                        ]}
+                                    >
+                                        <Input placeholder={"Full Name"}/>
+                                    </Form.Item>
+                                    <Form.Item
+                                        label={<span className="text-[#ffffff] font-poppins">Phone</span>}
+                                        name={"phone"}
+                                        hasFeedback={true}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: "Please input your Phone Number!",
+                                            },
+                                            () => ({
+                                                validator(_, value: string) {
+                                                    if (value.startsWith("+")) {
+                                                        return Promise.resolve();
+                                                    }
+                                                    return Promise.reject(new Error('Please Input your phone number in International Format.'));
+                                                },
+                                            }),
+                                        ]}
+                                    >
+                                        <Input placeholder={"+14375225525"}/>
+                                    </Form.Item>
+                                    <Form.Item
+                                        label={<span className="text-[#ffffff] font-poppins">Password</span>}
+                                        name="password"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: "Please input your password!",
+                                            },
+                                        ]}
+                                    >
+                                        <Input.Password placeholder={"Password"}/>
+                                    </Form.Item>
+                                    <Form.Item
+                                        label={<span className="text-[#ffffff] font-poppins">Confirm</span>}
+                                        name="confirm_password"
+                                        hasFeedback={true}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: "Please confirm your password!",
+                                            },
+                                            ({getFieldValue}) => ({
+                                                validator(_, value) {
+                                                    if (!value || getFieldValue('password') === value) {
+                                                        return Promise.resolve();
+                                                    }
+                                                    return Promise.reject(new Error('The new password that you entered do not match!'));
+                                                },
+                                            }),
+                                        ]}
+                                    >
+                                        <Input.Password placeholder={"Password"}/>
+                                    </Form.Item>
+                                    <Form.Item
+                                        wrapperCol={{
+                                            offset: 10,
+                                            span: 14,
+                                        }}
+                                    >
+                                        <Button
+                                            type="primary"
+                                            htmlType="submit"
+                                            className={`my-8 rounded text-lg font-bold ${isLoading ? 'opacity-50' : ''}`}
+                                            disabled={isLoading as boolean}
+                                            loading={isLoading as boolean}
+                                        >
+                                            Signup
+                                        </Button>
+                                    </Form.Item>
+                                </Form>
+                            </div>
+                        }
+                        {
+                            isLoading &&
+                            <div className={"w-full h-full flex justify-center items-center"}><LoadingSpinner
+                                size={80}/></div>
+                        }
+                    </div>
+                </main>
+                <Footer/>
             </div>
-            <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-              <span className="text-[h#ffffff]">Signup Form</span>
-            </h1>
-            <div className="text-white ">
-              <Form
-                  labelCol={{ span: 8 }}
-                  wrapperCol={{ span: 16 }}
-                  autoComplete="off"
-                  onFinish={handleSignup}
-                  onFinishFailed={handleCancel}
-                  style={{
-                    color: "white",
-                  }}
-              >
-                <Form.Item
-                    label={<span className="text-[#ffffff] font-poppins">Email</span>}
-                    name={"email"}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your Email!",
-                      },
-                    ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                    label={<span className="text-[#ffffff] font-poppins">Name</span>}
-                    name={"name"}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your name!",
-                      },
-                    ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                    label={<span className="text-[#ffffff] font-poppins">Phone</span>}
-                    name={"phone"}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your Phone Number!",
-                      },
-                    ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                    label={<span className="text-[#ffffff] font-poppins">Password</span>}
-                    name="password"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your password!",
-                      },
-                    ]}
-                >
-                  <Input.Password />
-                </Form.Item>
-                <Form.Item
-                    wrapperCol={{
-                      offset: 10,
-                      span: 16,
-                    }}
-                >
-                  <Button
-                      type="primary"
-                      htmlType="submit"
-                      className={`px-8 pb-8 rounded text-lg font-bold ${loading ? 'opacity-50' : ''}`}
-                      disabled={loading}
-                  >
-                    {loading ? <LoadingOutlined spin /> : 'Sign up'}
-                  </Button>
-                </Form.Item>
-              </Form>
-            </div>
-          </div>
-        </main>
-      </>
-  );
+        </>
+    );
 }

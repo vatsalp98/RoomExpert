@@ -4,34 +4,35 @@ import {appWriteProcedure, createTRPCRouter} from "~/server/api/trpc";
 import {env} from "~/env.mjs";
 import {TRPCError} from "@trpc/server";
 import type {RcFile} from "antd/es/upload";
+import {Query} from "appwrite";
 
 export const exampleRouter = createTRPCRouter({
-  createAccount: appWriteProcedure
-    .input(
-      z.object({
-        email: z.string(),
-        name: z.string(),
-        password: z.string(),
-        phone: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const response = await ctx.users.create(
-        ID.unique(),
-        input.email,
-        input.phone,
-        input.password,
-        input.name
-      );
+    createAccount: appWriteProcedure
+        .input(
+            z.object({
+                email: z.string(),
+                name: z.string(),
+                password: z.string(),
+                phone: z.string(),
+            })
+        )
+        .mutation(async ({ctx, input}) => {
+            const response = await ctx.users.create(
+                ID.unique(),
+                input.email,
+                input.phone,
+                input.password,
+                input.name
+            );
 
-      return response;
-    }),
+            return response;
+        }),
 
-    listFiles: appWriteProcedure.query(async ({ctx }) => {
+    listFiles: appWriteProcedure.query(async ({ctx}) => {
         try {
             return await ctx.sdk.storage.listFiles(process.env.NEXT_PUBLIC_BUCKET_ID as string);
-        } catch (error){
-            throw new TRPCError({code:  "INTERNAL_SERVER_ERROR", message: `something went Wrong`})
+        } catch (error) {
+            throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: `something went Wrong`})
         }
     }),
 
@@ -50,7 +51,7 @@ export const exampleRouter = createTRPCRouter({
     ).mutation(async ({ctx, input}) => {
         try {
             return await ctx.sdk.storage.createFile(env.BUCKET_ID, ID.unique(), input.file as RcFile);
-        } catch(e) {
+        } catch (e) {
             console.log(e);
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -63,15 +64,24 @@ export const exampleRouter = createTRPCRouter({
         return await ctx.sdk.account.get();
     }),
 
+    listUsers: appWriteProcedure.input(z.object({
+        email: z.string().min(1),
+    })).mutation(async ({ctx, input}) => {
+        const result = await ctx.sdk.users.list([
+            Query.equal('email', [input.email]),
+        ]);
+
+        return result.total;
+    }),
+
     generate: appWriteProcedure.input(
         z.object({
             user_id: z.string(),
             image_url: z.string(),
-            theme:  z.string(),
+            theme: z.string(),
             room: z.string(),
         })
-    ).mutation(async ({ input}) => {
-        console.log(input.theme, input.room);
+    ).mutation(async ({input}) => {
         const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
             method: "POST",
             headers: {
@@ -101,7 +111,7 @@ export const exampleRouter = createTRPCRouter({
         let restoredImage: string | null = null;
         while (!restoredImage) {
             // Loop in 1s intervals until the alt text is ready
-            console.log("polling for result...");
+            console.log("waiting for result...");
             const finalResponse = await fetch(endpointUrl as string, {
                 method: "GET",
                 headers: {
@@ -113,7 +123,7 @@ export const exampleRouter = createTRPCRouter({
             const jsonFinalResponse = await finalResponse.json();
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (jsonFinalResponse.status === "succeeded") {
-
+                console.log(jsonFinalResponse);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
                 restoredImage = jsonFinalResponse.output[1];
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
