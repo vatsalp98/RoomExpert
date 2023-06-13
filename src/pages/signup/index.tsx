@@ -21,7 +21,7 @@ export default function SignupPage() {
     password: string;
     phone: string;
   }) => {
-    console.log(values);
+    setLoading(true);
     return createAccount({
       email: values.email,
       name: values.name,

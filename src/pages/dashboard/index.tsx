@@ -1,10 +1,10 @@
-import {DownloadOutlined, InboxOutlined, PictureOutlined, RedoOutlined, StarTwoTone} from "@ant-design/icons";
+import {DownloadOutlined, InboxOutlined, PictureOutlined, RedoOutlined } from "@ant-design/icons";
 import {
   Upload,
   message,
   type UploadFile,
   type UploadProps,
-  Button, type  SelectProps, Select, Divider,
+  Button, type  SelectProps, Select
 } from "antd";
 import type { RcFile } from "antd/es/upload";
 import { ID, Storage } from "appwrite";
@@ -13,10 +13,9 @@ import { useState } from "react";
 import Image from "next/image";
 import {api} from "~/utils/api";
 import { LoadingSpinner } from "~/components/loadingPage";
-import downloadFile, {appendNewToName, client} from "~/utils/utils";
+import {appendNewToName, client} from "~/utils/utils";
 import {useRouter} from "next/router";
 import downloadPhoto from "~/utils/utils";
-import Empty from "antd/es/empty/empty";
 import Header from "~/components/header";
 import Footer from "~/components/footer";
 
