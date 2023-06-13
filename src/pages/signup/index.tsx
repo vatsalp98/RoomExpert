@@ -6,7 +6,6 @@ import {useRouter} from "next/router";
 import {api} from "~/utils/api";
 import Header from "~/components/header";
 import Footer from "~/components/footer";
-import {FetchState, useGetUser} from "~/utils/hooks/useGetUser";
 import {LoadingSpinner} from "~/components/loadingPage";
 
 export default function SignupPage() {
@@ -14,25 +13,20 @@ export default function SignupPage() {
         mutate: createAccount,
         error,
         isSuccess,
-        data: account_payload,
+        isLoading,
     } = api.example.createAccount.useMutation();
     const [messageApi, contextHolder] = message.useMessage();
     const router = useRouter();
-    const [{user, isLoading, isError}, dispatch] = useGetUser();
 
-    const {
-        mutate: listUsers,
-        data: user_count,
-        isSuccess: user_count_success,
-    } = api.example.listUsers.useMutation();
+
     const handleSignup = (values: {
         email: string;
         name: string;
         password: string;
         phone: string;
     }) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        dispatch({type: FetchState.FETCH_INIT});
+
+
         return createAccount({
             email: values.email,
             name: values.name,
@@ -46,15 +40,11 @@ export default function SignupPage() {
     };
 
     if (isSuccess) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        dispatch({type: FetchState.FETCH_SUCCESS, data: account_payload});
         void messageApi.success("Account successfully created, You can now Login!");
         void router.push("/signin");
     }
 
     if (error) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        dispatch({type: FetchState.FETCH_FAILURE});
         void messageApi.error(error.message);
     }
 

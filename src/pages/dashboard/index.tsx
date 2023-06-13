@@ -72,7 +72,6 @@ const optionsRoomThemes: SelectProps['options'] = [
     },
 ];
 
-
 export default function DashboardPage() {
     const storage = new Storage(client);
 
@@ -92,7 +91,7 @@ export default function DashboardPage() {
         data: generatedImage
     } = api.example.generate.useMutation();
 
-    const props: UploadProps = {
+    const uploadProps: UploadProps = {
         name: "file",
         listType: "picture",
         onRemove: (file) => {
@@ -220,7 +219,7 @@ export default function DashboardPage() {
                                             <p className="text-center mb-6 font-medium">
                                                 Upload your room photo.
                                             </p>
-                                            <Dragger {...props}>
+                                            <Dragger {...uploadProps}>
                                                 {fileList.length >= 1 ? null : uploadButton}
                                             </Dragger>
                                         </div>
@@ -286,14 +285,10 @@ export default function DashboardPage() {
                                                 }}>
                                                     Download
                                                 </Button>
-                                                <Button type={"primary"} icon={<SaveOutlined/>} onClick={() => {
-
-                                                }}>
+                                                <Button type={"primary"} icon={<SaveOutlined/>}>
                                                     Save Image
                                                 </Button>
-                                                <Button type={"primary"} icon={<ShopOutlined/>} onClick={() => {
-
-                                                }}>
+                                                <Button type={"primary"} icon={<ShopOutlined/>}>
                                                     View related Products
                                                 </Button>
                                                 <Button type={"primary"} icon={<RedoOutlined/>} onClick={() => {
@@ -315,7 +310,7 @@ export default function DashboardPage() {
                             Previously saved <span className="text-blue-600">dream</span> rooms
                         </h1>
                         <div>
-                            
+
                         </div>
                     </div>
                 </main>
@@ -324,44 +319,3 @@ export default function DashboardPage() {
         </>
     );
 }
-
-
-//<main className="flex min-h-screen flex-col items-center justify-center bg-[#17181C] text-white">
-//         <div className="container flex flex-col items-center justify-center gap-12 rounded-lg bg-white/20 px-4 py-16">
-//           <div>
-//             <Link href={"/"}>Home</Link>
-//           </div>
-//           <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-//             <span className="text-[hsl(280,100%,70%)]">Dashboard</span>
-//           </h1>
-//           <div className={"flex flex-col"}>
-//             <div className="text-white ">
-//               <Dragger {...props}>
-//                 <div className="p-1">
-//                   <p className="ant-upload-drag-icon">
-//                     <InboxOutlined />
-//                   </p>
-//                   <p className="ant-upload-text">
-//                     Click or drag file to this area to upload
-//                   </p>
-//                   <p className="ant-upload-hint">
-//                     Support for a single or bulk upload. Strictly prohibited from
-//                     uploading company data or other banned files.
-//                   </p>
-//                 </div>
-//               </Dragger>
-//             </div>
-//             <div>
-//               <Button onClick={handleUpload}>Upload</Button>
-//             </div>
-//           </div>
-//           <div>
-//             <Table >
-//
-//             </Table>
-//           </div>
-//           <div>
-//             <h2>Result</h2>
-//           </div>
-//         </div>
-//       </main>

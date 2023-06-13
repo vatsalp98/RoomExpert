@@ -17,7 +17,7 @@ export const exampleRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ctx, input}) => {
-            const response = await ctx.users.create(
+            const response = await ctx.sdk.users.create(
                 ID.unique(),
                 input.email,
                 input.phone,
