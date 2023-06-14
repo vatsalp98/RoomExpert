@@ -38,12 +38,19 @@ export const exampleRouter = createTRPCRouter({
             return response;
         }),
 
-    listFiles: appWriteProcedure.query(async ({ctx}) => {
-        try {
-            return await ctx.sdk.storage.listFiles(process.env.NEXT_PUBLIC_BUCKET_ID as string);
-        } catch (error) {
-            throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: `something went Wrong`})
-        }
+    listRoomsRecords: appWriteProcedure.input(
+        z.object({
+            user_id: z.any(),
+        })
+    ).query(async ({ctx, input}) => {
+        console.log(input.user_id);
+        return await ctx.sdk.database.listDocuments(
+            process.env.NEXT_PUBLIC_ROOMS_DATABASE_ID as string,
+            process.env.NEXT_PUBLIC_AI_ROOMS_COLLECTION_ID as string,
+            [
+                Query.equal('user_id', input.user_id as string),
+            ]
+        );
     }),
 
     getPreview: appWriteProcedure.input(
@@ -126,30 +133,34 @@ export const exampleRouter = createTRPCRouter({
             body: JSON.stringify(json_payload),
         }).then(r => r.json());
 
+        // let products = [];
+        console.log(response_objects['clarifai']['items'][0]);
+        // while (products.length == 0) {
+        //     const url2 = 'https://appwrite-hackathon.gottacatchemall.repl.co/get_product';
+        //     const json_payload2 = {
+        //         "detected_object": response_objects['clarifai']['items'][0],
+        //         "image_url": input.image_url,
+        //     };
+        //     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        //     const result = await fetch(url2, {
+        //         method: 'POST',
+        //         body: JSON.stringify(json_payload2),
+        //     });
+        //     const body = await result.text();
+        //     console.log(body);
+        // }
 
-        // const url2 = 'https://appwrite-hackathon.gottacatchemall.repl.co/get_product';
-        // const json_payload2 = {
-        //     "detected_object": response_objects['clarifai']['items'][0],
-        //     "image_url": input.image_url,
-        // };
-        // // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        // const result = await fetch(url2, {
-        //     method: 'POST',
-        //     body: JSON.stringify(json_payload2),
-        // });
-        // const body = await result.text();
-        // console.log(body);
         return response_objects['clarifai']['items'];
     }),
 
     generate: appWriteProcedure.input(
         z.object({
-            user_id: z.string(),
+            user_id: z.any(),
             image_url: z.string(),
             theme: z.string(),
             room: z.string(),
         })
-    ).mutation(async ({input}) => {
+    ).mutation(async ({ctx, input}) => {
         const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
             method: "POST",
             headers: {
@@ -193,6 +204,18 @@ export const exampleRouter = createTRPCRouter({
             if (jsonFinalResponse.status === "succeeded") {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
                 restoredImage = jsonFinalResponse.output[1];
+                await ctx.sdk.database.createDocument(
+                    process.env.NEXT_PUBLIC_ROOMS_DATABASE_ID as string,
+                    process.env.NEXT_PUBLIC_AI_ROOMS_COLLECTION_ID as string,
+                    ID.unique(),
+                    {
+                        user_id: input.user_id as string,
+                        user_image_url: input.image_url,
+                        createdAt: new Date().toISOString(),
+                        input_prompt: `A ${input.theme} ${input.room}`,
+                        generated_image_url: restoredImage,
+                    }
+                );
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             } else if (jsonFinalResponse.status === "failed") {
                 break;

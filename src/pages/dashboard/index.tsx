@@ -18,6 +18,9 @@ import downloadPhoto, {appendNewToName, client} from "~/utils/utils";
 import Header from "~/components/header";
 import Footer from "~/components/footer";
 import * as process from "process";
+import ObjectTable from "~/components/ObjectTable";
+import {useRouter} from "next/router";
+import RoomTable from "~/components/RoomsTable";
 
 
 const {Dragger} = Upload;
@@ -74,17 +77,26 @@ const optionsRoomThemes: SelectProps['options'] = [
 
 export default function DashboardPage() {
     const storage = new Storage(client);
-
+    const router = useRouter();
     const [previewImage, setPreviewImage] = useState('');
     const [messageApi, contextHolder] = message.useMessage();
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [loading, setLoading] = useState(false);
+    const {user_id} = router.query;
+    const {
+        data: previousRooms,
+        isLoading: previousLoading,
+    } = api.example.listRoomsRecords.useQuery({
+        user_id: user_id,
+    });
+
 
     const [roomType, setRoomType] = useState('bedroom');
     const [roomTheme, setRoomTheme] = useState('modern');
     const {
         mutate: getObjects,
-
+        data: objectsDetected,
+        isLoading: objectsLoading,
     } = api.example.getObjects.useMutation();
 
     const {
@@ -145,7 +157,7 @@ export default function DashboardPage() {
             image_url: previewImage,
             room: roomType,
             theme: roomTheme,
-            user_id: "user_uid",
+            user_id: user_id ?? "uid",
         });
     }
 
@@ -281,12 +293,13 @@ export default function DashboardPage() {
                                             <LoadingSpinner/>
                                         </div>
                                     }
-                                    {!generateLoading && !generatedImage && <div className={"border rounded-lg p-10"}>
-                                        <PictureOutlined className={"text-5xl"}/>
-                                        <p className={"pt-2 font-semibold "}>
-                                            Generate your dream room design!
-                                        </p>
-                                    </div>
+                                    {!generateLoading && !generatedImage &&
+                                        <div className={"border rounded-lg p-10"}>
+                                            <PictureOutlined className={"text-5xl"}/>
+                                            <p className={"pt-2 font-semibold "}>
+                                                Generate your dream room design!
+                                            </p>
+                                        </div>
                                     }
                                     {
                                         generatedImage &&
@@ -303,13 +316,15 @@ export default function DashboardPage() {
                                     !!generatedImage &&
                                     <div className={"flex justify-between items-center w-full flex-col mt-4"}>
                                         <div className="space-y-4 w-full max-w-sm h-full">
-                                            <div className="flex flex-row mt-3 items-center space-x-3 justify-center">
+                                            <div
+                                                className="flex flex-row mt-3 items-center space-x-3 justify-center">
                                                 <Button type={"primary"} icon={<DownloadOutlined/>} onClick={() => {
                                                     downloadPhoto(generatedImage, appendNewToName("generated_room.png"));
                                                 }}>
                                                     Download
                                                 </Button>
-                                                <Button type={"primary"} icon={<SaveOutlined/>} onClick={handleSave}>
+                                                <Button type={"primary"} icon={<SaveOutlined/>}
+                                                        onClick={handleSave}>
                                                     Detect Objects
                                                 </Button>
                                                 <Button type={"primary"} icon={<ShopOutlined/>}>
@@ -327,19 +342,25 @@ export default function DashboardPage() {
                                 }
                             </div>
                             <div>
-                                
+                                <p className="text-center mb-6 font-medium mt-5">
+                                    Detected Objects
+                                </p>
+                            </div>
+                            <div className={"w-full px-20"}>
+                                <ObjectTable data={objectsDetected ?? []} loading={objectsLoading}/>
+
                             </div>
                         </div>
 
                     </div>
-                    {/*<div className={"border-t border-gray-500 w-auto mt-7 pt-8 pb-10"}>*/}
-                    {/*    <h1 className="mx-auto max-w-4xl font-display text-4xl font-bold tracking-normal text-slate-100 sm:text-6xl mb-5">*/}
-                    {/*        Previously saved <span className="text-blue-600">dream</span> rooms*/}
-                    {/*    </h1>*/}
-                    {/*    <div>*/}
-
-                    {/*    </div>*/}
-                    {/*</div>*/}
+                    <div className={"border-t border-gray-500 w-auto mt-7 pt-8 pb-10"}>
+                        <h1 className="mx-auto max-w-4xl font-display text-4xl font-bold tracking-normal text-slate-100 sm:text-6xl mb-5">
+                            Previously saved <span className="text-blue-600">dream</span> rooms
+                        </h1>
+                        <div className={"mt-20 bg-white/75 p-5 rounded-lg"}>
+                            <RoomTable data={previousRooms?.documents ?? []} loading={previousLoading}/>
+                        </div>
+                    </div>
                 </main>
                 <Footer/>
             </div>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import {LoginOutlined, LogoutOutlined, ThunderboltOutlined} from "@ant-design/icons";
 import {Button, message} from "antd";
 import {client} from "~/utils/utils";
-import {Account, AppwriteException} from "appwrite";
+import {Account, type AppwriteException} from "appwrite";
 import {useRouter} from "next/router";
 import {useGetUser} from "~/utils/hooks/useGetUser";
 

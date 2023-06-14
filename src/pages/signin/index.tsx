@@ -28,7 +28,7 @@ export default function SigninPage() {
                 form.resetFields();
                 setLoading(false);
                 if (response.userId) {
-                    void router.push({pathname: "/dashboard", query: {user_id: response.$id}});
+                    void router.push({pathname: "/dashboard", query: {user_id: response.userId}});
                 }
             },
             function (error: { message: string; type: string; code: number }) {
