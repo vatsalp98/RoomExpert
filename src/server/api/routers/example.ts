@@ -43,10 +43,10 @@ export const exampleRouter = createTRPCRouter({
             user_id: z.any(),
         })
     ).query(async ({ctx, input}) => {
-        console.log(input.user_id);
+
         return await ctx.sdk.database.listDocuments(
-            env.ROOMS_DATABASE_ID as string,
-            env.AI_ROOMS_COLLECTION_ID as string,
+            env.ROOMS_DATABASE_ID,
+            env.AI_ROOMS_COLLECTION_ID,
             [
                 Query.equal('user_id', input.user_id as string),
             ]
