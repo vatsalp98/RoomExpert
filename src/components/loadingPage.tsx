@@ -3,8 +3,9 @@ import {Spin} from "antd";
 
 export const LoadingSpinner = (props: {
     size?: number,
+    color?: string,
 }) => {
-    const antIcon = <LoadingOutlined style={{fontSize: props.size ?? 64, color: "white"}} spin/>;
+    const antIcon = <LoadingOutlined style={{fontSize: props.size ?? 64, color: props.color ?? "white"}} spin/>;
     return (
         <div className={"status"}>
             <Spin indicator={antIcon}/>

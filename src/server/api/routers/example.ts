@@ -6,15 +6,8 @@ import {TRPCError} from "@trpc/server";
 import type {RcFile} from "antd/es/upload";
 import {Query} from "appwrite";
 import process from "process";
+import {detectedObject} from "~/utils/types";
 
-interface detectedObject {
-    label: string,
-    confidence: number,
-    x_min: number,
-    y_min: number,
-    x_max: number,
-    y_max: number,
-}
 
 export const exampleRouter = createTRPCRouter({
     createAccount: appWriteProcedure
@@ -114,7 +107,7 @@ export const exampleRouter = createTRPCRouter({
 
     getObjects: appWriteProcedure.input(z.object({
         image_url: z.string(),
-    })).mutation(async ({ctx, input}) => {
+    })).mutation(async ({input}) => {
         const url = "https://api.edenai.run/v2/image/object_detection"
         const json_payload = {"providers": "clarifai", "file_url": input.image_url};
         const headers = {

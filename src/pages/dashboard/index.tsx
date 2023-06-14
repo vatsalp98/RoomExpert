@@ -6,7 +6,7 @@ import {
     SaveOutlined,
     ShopOutlined
 } from "@ant-design/icons";
-import {Button, message, Select, type  SelectProps, Upload, type UploadFile, type UploadProps} from "antd";
+import {Button, message, Modal, Select, type  SelectProps, Upload, type UploadFile, type UploadProps} from "antd";
 import type {RcFile} from "antd/es/upload";
 import {ID, Storage} from "appwrite";
 import Head from "next/head";
@@ -21,6 +21,7 @@ import * as process from "process";
 import ObjectTable from "~/components/ObjectTable";
 import {useRouter} from "next/router";
 import RoomTable from "~/components/RoomsTable";
+import {detectedObject} from "~/utils/types";
 
 
 const {Dragger} = Upload;
@@ -83,6 +84,8 @@ export default function DashboardPage() {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [loading, setLoading] = useState(false);
     const {user_id} = router.query;
+    const [object, setObject] = useState<detectedObject>();
+    const [showModal, setShowModal] = useState(false);
     const {
         data: previousRooms,
         isLoading: previousLoading,
@@ -152,6 +155,12 @@ export default function DashboardPage() {
         })
     };
 
+    const {
+        mutate: getProducts,
+        isLoading: productsLoading,
+        data: products
+    } = api.example.getRelatedProducts.useMutation();
+
     const handleGenerate = () => {
         generateImage({
             image_url: previewImage,
@@ -185,6 +194,15 @@ export default function DashboardPage() {
         } else {
             void messageApi.error("No rooms have been generated yet!");
         }
+    }
+
+    const handleCallback = (object: detectedObject) => {
+        setObject(object);
+        setShowModal(true);
+        getProducts({
+            image_url: generatedImage ?? "",
+            object: object,
+        });
     }
 
     return (
@@ -347,7 +365,18 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                             <div className={"w-full px-20"}>
-                                <ObjectTable data={objectsDetected ?? []} loading={objectsLoading}/>
+                                <ObjectTable data={objectsDetected ?? []} loading={objectsLoading}
+                                             image_url={generatedImage ?? ""} handleCallback={handleCallback}/>
+                                <Modal open={showModal} title={"Related Products Links"} onCancel={() => {
+                                    setShowModal(false);
+                                }}>
+                                    {
+                                        productsLoading ?
+                                            <div className={"justify-center flex my-10"}><LoadingSpinner
+                                                color={"blue"}/>
+                                            </div> : <div className={"my-2"}>{object?.label}</div>
+                                    }
+                                </Modal>
 
                             </div>
                         </div>
