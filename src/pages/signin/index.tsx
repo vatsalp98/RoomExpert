@@ -7,36 +7,33 @@ import {client} from "~/utils/utils";
 import {ArrowLeftOutlined} from '@ant-design/icons';
 import "@fontsource/poppins";
 import {LoadingSpinner} from "~/components/loadingPage";
-import {FetchState, useGetUser} from "~/utils/hooks/useGetUser";
 import Header from "~/components/header";
 import Footer from "~/components/footer";
+import {useState} from "react";
 
 export default function SigninPage() {
     const [messageApi, contextHolder] = message.useMessage();
     const router = useRouter();
     const account = new Account(client);
     const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const [{user, isLoading, isError}, dispatch] = useGetUser();
+
 
     const handleLogin = (values: { email: string; password: string }) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        dispatch({type: FetchState.FETCH_INIT});
-
+        setLoading(true);
         const result = account.createEmailSession(values.email, values.password);
         result.then(
             function (response) {
                 form.resetFields();
+                setLoading(false);
                 if (response.userId) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                    dispatch({type: FetchState.FETCH_SUCCESS, data: response});
                     void router.push({pathname: "/dashboard", query: {user_id: response.$id}});
                 }
             },
             function (error: { message: string; type: string; code: number }) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                dispatch({type: FetchState.FETCH_FAILURE});
                 form.resetFields();
+                setLoading(false);
                 if (error) void messageApi.error(error?.message);
             }
         );
@@ -67,7 +64,7 @@ export default function SigninPage() {
                         </h2>
                         <div className={"text-white pt-1"}>
                             {
-                                !(isLoading as boolean) && <Form
+                                !(loading) && <Form
                                     form={form}
                                     labelCol={{span: 24}}
                                     wrapperCol={{span: 24}}
@@ -96,9 +93,8 @@ export default function SigninPage() {
                                         <Button
                                             type="primary"
                                             htmlType="submit"
-                                            className={`px-8 pb-8 rounded text-lg font-bold ${isLoading ? 'opacity-50' : ''}`}
-                                            disabled={isLoading as boolean}
-                                            loading={isLoading as boolean}
+                                            className={`px-8 pb-8 rounded text-lg font-bold ${loading ? 'opacity-50' : ''}`}
+                                            loading={loading}
                                         >
                                             Login
                                         </Button>
@@ -107,7 +103,7 @@ export default function SigninPage() {
                             }
                         </div>
                         {
-                            isLoading &&
+                            loading &&
                             <div className={"w-full h-full flex justify-center items-center"}><LoadingSpinner
                                 size={80}/></div>
                         }

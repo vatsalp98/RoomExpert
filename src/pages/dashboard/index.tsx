@@ -18,6 +18,7 @@ import downloadPhoto, {appendNewToName, client} from "~/utils/utils";
 import {useRouter} from "next/router";
 import Header from "~/components/header";
 import Footer from "~/components/footer";
+import * as process from "process";
 
 
 const {Dragger} = Upload;
@@ -84,16 +85,22 @@ export default function DashboardPage() {
     const [roomType, setRoomType] = useState('bedroom');
     const [roomTheme, setRoomTheme] = useState('modern');
     const {
-        mutate: saveImage,
+        mutate: getObjects,
         isLoading: saveLoading,
-        data: saveRoomId,
-    } = api.example.saveRoomImage.useMutation();
+        data: detectedObjects,
+    } = api.example.getObjects.useMutation();
 
     const {
         mutate: generateImage,
         isLoading: generateLoading,
-        data: generatedImage
+        data: generatedImage,
+        isSuccess,
     } = api.example.generate.useMutation();
+
+    const {
+        mutate: getRelatedProducts,
+        data: productsFound,
+    } = api.example.getRelatedProducts.useMutation();
 
     const uploadProps: UploadProps = {
         name: "file",
@@ -112,6 +119,10 @@ export default function DashboardPage() {
         fileList,
     };
 
+    const handleProduct = (object: any) => {
+
+    }
+
 
     const handleUpload = () => {
         setLoading(true);
@@ -124,6 +135,7 @@ export default function DashboardPage() {
         promise.then(function (response) {
             const filePromise = storage.getFilePreview(process.env.NEXT_PUBLIC_BUCKET_ID as string, response.$id);
             setPreviewImage(filePromise.toString());
+            void messageApi.success("Image uploaded successfully, ready to generate!");
             setLoading(false);
         }, function (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
@@ -133,7 +145,6 @@ export default function DashboardPage() {
     };
 
     const handleGenerate = () => {
-        // console.log(roomType, roomTheme);
         generateImage({
             image_url: previewImage,
             room: roomType,
@@ -157,6 +168,16 @@ export default function DashboardPage() {
         </div>
     );
 
+
+    const handleSave = () => {
+        if (generatedImage) {
+            getObjects({
+                image_url: generatedImage
+            })
+        } else {
+            void messageApi.error("No rooms have been generated yet!");
+        }
+    }
 
     return (
         <>
@@ -273,9 +294,12 @@ export default function DashboardPage() {
                                     }
                                     {
                                         generatedImage &&
-                                        <div className={"border rounded-lg p-10"}><Image alt={"generated Image"}
-                                                                                         src={generatedImage}
-                                                                                         width={500} height={500}/>
+                                        <div className={"border rounded-lg p-10"}>
+                                            <a href={generatedImage} target={"_blank"}>
+                                                <Image alt={"generated Image"}
+                                                       src={generatedImage}
+                                                       width={500} height={500}/>
+                                            </a>
                                         </div>
                                     }
                                 </div>
@@ -289,12 +313,8 @@ export default function DashboardPage() {
                                                 }}>
                                                     Download
                                                 </Button>
-                                                <Button type={"primary"} icon={<SaveOutlined/>} onClick={() => {
-                                                    saveImage({
-                                                        image_url: generatedImage,
-                                                    })
-                                                }}>
-                                                    Save Image
+                                                <Button type={"primary"} icon={<SaveOutlined/>} onClick={handleSave}>
+                                                    Detect Objects
                                                 </Button>
                                                 <Button type={"primary"} icon={<ShopOutlined/>}>
                                                     View related Products
@@ -310,17 +330,21 @@ export default function DashboardPage() {
                                     </div>
                                 }
                             </div>
+                            <div>
+
+
+                            </div>
                         </div>
 
                     </div>
-                    <div className={"border-t border-gray-500 w-auto mt-7 pt-8 pb-10"}>
-                        <h1 className="mx-auto max-w-4xl font-display text-4xl font-bold tracking-normal text-slate-100 sm:text-6xl mb-5">
-                            Previously saved <span className="text-blue-600">dream</span> rooms
-                        </h1>
-                        <div>
+                    {/*<div className={"border-t border-gray-500 w-auto mt-7 pt-8 pb-10"}>*/}
+                    {/*    <h1 className="mx-auto max-w-4xl font-display text-4xl font-bold tracking-normal text-slate-100 sm:text-6xl mb-5">*/}
+                    {/*        Previously saved <span className="text-blue-600">dream</span> rooms*/}
+                    {/*    </h1>*/}
+                    {/*    <div>*/}
 
-                        </div>
-                    </div>
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </main>
                 <Footer/>
             </div>

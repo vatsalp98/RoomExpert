@@ -5,6 +5,16 @@ import {env} from "~/env.mjs";
 import {TRPCError} from "@trpc/server";
 import type {RcFile} from "antd/es/upload";
 import {Query} from "appwrite";
+import process from "process";
+
+interface detectedObject {
+    label: string,
+    confidence: number,
+    x_min: number,
+    y_min: number,
+    x_max: number,
+    y_max: number,
+}
 
 export const exampleRouter = createTRPCRouter({
     createAccount: appWriteProcedure
@@ -74,18 +84,62 @@ export const exampleRouter = createTRPCRouter({
         return result.total;
     }),
 
-    saveRoomImage: appWriteProcedure.input(z.object({
+    getRelatedProducts: appWriteProcedure.input(
+        z.object({
+            object: z.any(),
+            image_url: z.string(),
+        })
+    ).mutation(async ({ctx, input}) => {
+        const url = 'https://appwrite-hackathon.gottacatchemall.repl.co/get_product';
+        const json_payload = {
+            "detected_object": input.object as detectedObject,
+            "image_url": input.image_url,
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const result = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(json_payload),
+        }).then(r => r.json());
+
+        console.log(result);
+
+    }),
+
+    getObjects: appWriteProcedure.input(z.object({
         image_url: z.string(),
     })).mutation(async ({ctx, input}) => {
-        const document = await ctx.sdk.database.createDocument(
-            process.env.NEXT_PUBLIC_ROOMS_DATABASE_ID as string,
-            process.env.NEXT_PUBLIC_AI_ROOMS_COLLECTION_ID as string,
-            ID.unique(),
-            {
-                image_url: input.image_url,
+        const url = "https://api.edenai.run/v2/image/object_detection"
+        const json_payload = {"providers": "clarifai", "file_url": input.image_url};
+        const headers = {
+            "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmNlODAwNDQtMmZmMS00Y2E5LTljMjQtN2MwNDQ3MjM5NmM3IiwidHlwZSI6ImFwaV90b2tlbiJ9.bVY2wCx8_-ee-iRos77yHHi8lFNwwQJEX7GoZhdoiD0`,
+            "content-type": "application/json"
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const response_objects: {
+            clarifai: {
+                status: string,
+                items: detectedObject[],
             }
-        )
-        return document.$id;
+        } = await fetch(url, {
+            headers: {...headers},
+            method: "POST",
+            body: JSON.stringify(json_payload),
+        }).then(r => r.json());
+
+
+        // const url2 = 'https://appwrite-hackathon.gottacatchemall.repl.co/get_product';
+        // const json_payload2 = {
+        //     "detected_object": response_objects['clarifai']['items'][0],
+        //     "image_url": input.image_url,
+        // };
+        // // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // const result = await fetch(url2, {
+        //     method: 'POST',
+        //     body: JSON.stringify(json_payload2),
+        // });
+        // const body = await result.text();
+        // console.log(body);
+        return response_objects['clarifai']['items'];
     }),
 
     generate: appWriteProcedure.input(
