@@ -15,7 +15,6 @@ import Image from "next/image";
 import {api} from "~/utils/api";
 import {LoadingSpinner} from "~/components/loadingPage";
 import downloadPhoto, {appendNewToName, client} from "~/utils/utils";
-import {useRouter} from "next/router";
 import Header from "~/components/header";
 import Footer from "~/components/footer";
 import * as process from "process";
@@ -81,26 +80,23 @@ export default function DashboardPage() {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [loading, setLoading] = useState(false);
 
-    const router = useRouter();
     const [roomType, setRoomType] = useState('bedroom');
     const [roomTheme, setRoomTheme] = useState('modern');
     const {
         mutate: getObjects,
-        isLoading: saveLoading,
-        data: detectedObjects,
+
     } = api.example.getObjects.useMutation();
 
     const {
         mutate: generateImage,
         isLoading: generateLoading,
         data: generatedImage,
-        isSuccess,
     } = api.example.generate.useMutation();
 
-    const {
-        mutate: getRelatedProducts,
-        data: productsFound,
-    } = api.example.getRelatedProducts.useMutation();
+    // const {
+    //     mutate: getRelatedProducts,
+    //     data: productsFound,
+    // } = api.example.getRelatedProducts.useMutation();
 
     const uploadProps: UploadProps = {
         name: "file",
@@ -119,9 +115,9 @@ export default function DashboardPage() {
         fileList,
     };
 
-    const handleProduct = (object: any) => {
-
-    }
+    // const handleProduct = (object: any) => {
+    //
+    // }
 
 
     const handleUpload = () => {
@@ -331,8 +327,7 @@ export default function DashboardPage() {
                                 }
                             </div>
                             <div>
-
-
+                                
                             </div>
                         </div>
 

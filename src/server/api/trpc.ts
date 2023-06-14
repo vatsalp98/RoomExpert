@@ -4,11 +4,7 @@ import superjson from "superjson";
 import {ZodError} from "zod";
 import {Account, Client, Databases, Graphql, Storage, Users} from "node-appwrite";
 
-
-type CreateContextOptions = Record<string, never>;
-
-
-export const createInnerTRPCContext = () => {
+const createInnerTRPCContext = () => {
     const client = new Client()
         .setEndpoint("https://cloud.appwrite.io/v1")
         .setProject("6482fe1170f8613388e3")

@@ -89,7 +89,7 @@ export const exampleRouter = createTRPCRouter({
             object: z.any(),
             image_url: z.string(),
         })
-    ).mutation(async ({ctx, input}) => {
+    ).mutation(async ({input}) => {
         const url = 'https://appwrite-hackathon.gottacatchemall.repl.co/get_product';
         const json_payload = {
             "detected_object": input.object as detectedObject,
@@ -149,7 +149,7 @@ export const exampleRouter = createTRPCRouter({
             theme: z.string(),
             room: z.string(),
         })
-    ).mutation(async ({ctx, input}) => {
+    ).mutation(async ({input}) => {
         const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
             method: "POST",
             headers: {

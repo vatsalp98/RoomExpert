@@ -2,7 +2,7 @@ import Link from "next/link";
 import {LoginOutlined, LogoutOutlined, ThunderboltOutlined} from "@ant-design/icons";
 import {Button, message} from "antd";
 import {client} from "~/utils/utils";
-import {Account} from "appwrite";
+import {Account, AppwriteException} from "appwrite";
 import {useRouter} from "next/router";
 import {useGetUser} from "~/utils/hooks/useGetUser";
 
@@ -27,10 +27,10 @@ export default function Header() {
                     {
                         user && <Button type={"primary"} danger icon={<LogoutOutlined/>} onClick={() => {
                             const promise = account.deleteSessions();
-                            promise.then(function (response) {
+                            promise.then(function () {
                                 void router.push('/');
-                            }, function (error) {
-                                void messageApi.error("Something went wrong try again!");
+                            }, function (error: AppwriteException) {
+                                void messageApi.error(error.message);
                             });
                         }} loading={isLoading as boolean}>
                             Logout
