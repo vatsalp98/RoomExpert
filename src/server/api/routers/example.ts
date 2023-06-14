@@ -178,6 +178,7 @@ export const exampleRouter = createTRPCRouter({
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const jsonStartResponse = await startResponse.json();
+        console.log(jsonStartResponse);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
         const endpointUrl = jsonStartResponse.urls.get;
         let restoredImage: string | null = null;
@@ -198,8 +199,8 @@ export const exampleRouter = createTRPCRouter({
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
                 restoredImage = jsonFinalResponse.output[1];
                 await ctx.sdk.database.createDocument(
-                    process.env.NEXT_PUBLIC_ROOMS_DATABASE_ID as string,
-                    process.env.NEXT_PUBLIC_AI_ROOMS_COLLECTION_ID as string,
+                    process.env.ROOMS_DATABASE_ID as string,
+                    process.env.AI_ROOMS_COLLECTION_ID as string,
                     ID.unique(),
                     {
                         user_id: input.user_id as string,
