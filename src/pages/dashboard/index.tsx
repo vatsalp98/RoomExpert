@@ -83,7 +83,11 @@ export default function DashboardPage() {
     const router = useRouter();
     const [roomType, setRoomType] = useState('bedroom');
     const [roomTheme, setRoomTheme] = useState('modern');
-
+    const {
+        mutate: saveImage,
+        isLoading: saveLoading,
+        data: saveRoomId,
+    } = api.example.saveRoomImage.useMutation();
 
     const {
         mutate: generateImage,
@@ -285,7 +289,11 @@ export default function DashboardPage() {
                                                 }}>
                                                     Download
                                                 </Button>
-                                                <Button type={"primary"} icon={<SaveOutlined/>}>
+                                                <Button type={"primary"} icon={<SaveOutlined/>} onClick={() => {
+                                                    saveImage({
+                                                        image_url: generatedImage,
+                                                    })
+                                                }}>
                                                     Save Image
                                                 </Button>
                                                 <Button type={"primary"} icon={<ShopOutlined/>}>

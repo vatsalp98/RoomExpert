@@ -74,6 +74,20 @@ export const exampleRouter = createTRPCRouter({
         return result.total;
     }),
 
+    saveRoomImage: appWriteProcedure.input(z.object({
+        image_url: z.string(),
+    })).mutation(async ({ctx, input}) => {
+        const document = await ctx.sdk.database.createDocument(
+            process.env.NEXT_PUBLIC_ROOMS_DATABASE_ID as string,
+            process.env.NEXT_PUBLIC_AI_ROOMS_COLLECTION_ID as string,
+            ID.unique(),
+            {
+                image_url: input.image_url,
+            }
+        )
+        return document.$id;
+    }),
+
     generate: appWriteProcedure.input(
         z.object({
             user_id: z.string(),
@@ -81,7 +95,7 @@ export const exampleRouter = createTRPCRouter({
             theme: z.string(),
             room: z.string(),
         })
-    ).mutation(async ({input}) => {
+    ).mutation(async ({ctx, input}) => {
         const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
             method: "POST",
             headers: {
@@ -123,7 +137,6 @@ export const exampleRouter = createTRPCRouter({
             const jsonFinalResponse = await finalResponse.json();
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (jsonFinalResponse.status === "succeeded") {
-                console.log(jsonFinalResponse);
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
                 restoredImage = jsonFinalResponse.output[1];
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

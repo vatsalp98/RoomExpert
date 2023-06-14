@@ -1,9 +1,16 @@
 import Link from "next/link";
-import {ThunderboltOutlined} from "@ant-design/icons";
-import {message} from "antd";
+import {LoginOutlined, LogoutOutlined, ThunderboltOutlined} from "@ant-design/icons";
+import {Button, message} from "antd";
+import {client} from "~/utils/utils";
+import {Account} from "appwrite";
+import {useRouter} from "next/router";
+import {useGetUser} from "~/utils/hooks/useGetUser";
 
 export default function Header() {
-
+    const router = useRouter();
+    const account = new Account(client);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const [{user, isLoading}] = useGetUser();
     const [messageApi, contextHolder] = message.useMessage();
     return (
         <>
@@ -16,26 +23,27 @@ export default function Header() {
                         RoomExpert
                     </h1>
                 </Link>
-                {/*<div>*/}
-                {/*    {*/}
-                {/*        user && <Button type={"primary"} danger icon={<LogoutOutlined/>} onClick={() => {*/}
-                {/*            const promise = account.deleteSessions();*/}
-                {/*            promise.then(function (response) {*/}
-                {/*                void router.push('/');*/}
-                {/*            }, function (error) {*/}
-                {/*                void messageApi.error("Something went wrong try again!");*/}
-                {/*            });*/}
-                {/*        }}>*/}
-                {/*            Logout*/}
-                {/*        </Button>*/}
-                {/*    }*/}
-                {/*    {*/}
-                {/*        !user && <Link href={"/signin"}><Button type={"primary"} icon={<LoginOutlined/>}>*/}
-                {/*            Signin*/}
-                {/*        </Button></Link>*/}
-                {/*    }*/}
+                <div>
+                    {
+                        user && <Button type={"primary"} danger icon={<LogoutOutlined/>} onClick={() => {
+                            const promise = account.deleteSessions();
+                            promise.then(function (response) {
+                                void router.push('/');
+                            }, function (error) {
+                                void messageApi.error("Something went wrong try again!");
+                            });
+                        }} loading={isLoading as boolean}>
+                            Logout
+                        </Button>
+                    }
+                    {
+                        !user && <Link href={"/signin"}><Button type={"primary"} icon={<LoginOutlined/>}
+                                                                loading={isLoading as boolean}>
+                            Signin
+                        </Button></Link>
+                    }
 
-                {/*</div>*/}
+                </div>
             </header>
         </>);
 

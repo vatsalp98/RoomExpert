@@ -25,8 +25,6 @@ export default function SignupPage() {
         password: string;
         phone: string;
     }) => {
-
-
         return createAccount({
             email: values.email,
             name: values.name,

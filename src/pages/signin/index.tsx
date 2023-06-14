@@ -30,7 +30,7 @@ export default function SigninPage() {
                 if (response.userId) {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                     dispatch({type: FetchState.FETCH_SUCCESS, data: response});
-                    void router.push("/dashboard");
+                    void router.push({pathname: "/dashboard", query: {user_id: response.$id}});
                 }
             },
             function (error: { message: string; type: string; code: number }) {
