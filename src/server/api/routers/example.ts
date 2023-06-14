@@ -6,7 +6,7 @@ import {TRPCError} from "@trpc/server";
 import type {RcFile} from "antd/es/upload";
 import {Query} from "appwrite";
 import process from "process";
-import {detectedObject} from "~/utils/types";
+import {detectedObject, Product} from "~/utils/types";
 
 
 export const exampleRouter = createTRPCRouter({
@@ -92,17 +92,26 @@ export const exampleRouter = createTRPCRouter({
     ).mutation(async ({input}) => {
         const url = 'https://appwrite-hackathon.gottacatchemall.repl.co/get_product';
         const json_payload = {
-            "detected_object": input.object as detectedObject,
             "image_url": input.image_url,
+            "detected_object": input.object as detectedObject,
         };
+        console.log(json_payload);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const result = await fetch(url, {
             method: 'POST',
+            headers: {
+                "content-type": "application/json",
+            },
             body: JSON.stringify(json_payload),
-        }).then(r => r.json());
-
-        console.log(result);
-
+        });
+        const response = await result.text();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment
+        const jsonResponse: {
+            "dominant_color": string,
+            "products": Product[],
+        } = JSON.parse(response);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return jsonResponse;
     }),
 
     getObjects: appWriteProcedure.input(z.object({

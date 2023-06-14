@@ -6,11 +6,22 @@ import {
     SaveOutlined,
     ShopOutlined
 } from "@ant-design/icons";
-import {Button, message, Modal, Select, type  SelectProps, Upload, type UploadFile, type UploadProps} from "antd";
+import {
+    Button,
+    List,
+    message,
+    Modal,
+    Select,
+    type  SelectProps,
+    Space,
+    Upload,
+    type UploadFile,
+    type UploadProps
+} from "antd";
 import type {RcFile} from "antd/es/upload";
 import {ID, Storage} from "appwrite";
 import Head from "next/head";
-import {useState} from "react";
+import React, {useState} from "react";
 import Image from "next/image";
 import {api} from "~/utils/api";
 import {LoadingSpinner} from "~/components/loadingPage";
@@ -108,10 +119,10 @@ export default function DashboardPage() {
         data: generatedImage,
     } = api.example.generate.useMutation();
 
-    // const {
-    //     mutate: getRelatedProducts,
-    //     data: productsFound,
-    // } = api.example.getRelatedProducts.useMutation();
+    const {
+        mutate: getRelatedProducts,
+        data: productsFound,
+    } = api.example.getRelatedProducts.useMutation();
 
     const uploadProps: UploadProps = {
         name: "file",
@@ -129,10 +140,6 @@ export default function DashboardPage() {
         },
         fileList,
     };
-
-    // const handleProduct = (object: any) => {
-    //
-    // }
 
 
     const handleUpload = () => {
@@ -158,7 +165,7 @@ export default function DashboardPage() {
     const {
         mutate: getProducts,
         isLoading: productsLoading,
-        data: products
+        data: products,
     } = api.example.getRelatedProducts.useMutation();
 
     const handleGenerate = () => {
@@ -204,6 +211,13 @@ export default function DashboardPage() {
             object: object,
         });
     }
+
+    const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
+        <Space>
+            {React.createElement(icon)}
+            {text}
+        </Space>
+    );
 
     return (
         <>
@@ -374,7 +388,20 @@ export default function DashboardPage() {
                                         productsLoading ?
                                             <div className={"justify-center flex my-10"}><LoadingSpinner
                                                 color={"blue"}/>
-                                            </div> : <div className={"my-2"}>{object?.label}</div>
+                                            </div> : <List
+                                                itemLayout="horizontal"
+                                                dataSource={products?.products}
+                                                renderItem={(item, index) => (
+                                                    <List.Item extra={<Image src={item.img} height={150} width={150}
+                                                                             alt={"Product Image"}/>}
+                                                    >
+                                                        <List.Item.Meta
+                                                            title={<a href={item.img}>{item.title}</a>}
+                                                            description={item.price}
+                                                        />
+                                                    </List.Item>
+                                                )}
+                                            />
                                     }
                                 </Modal>
 
