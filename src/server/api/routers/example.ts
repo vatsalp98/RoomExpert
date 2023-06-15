@@ -5,7 +5,6 @@ import {env} from "~/env.mjs";
 import {TRPCError} from "@trpc/server";
 import type {RcFile} from "antd/es/upload";
 import {Query} from "appwrite";
-import process from "process";
 import {detectedObject, Product} from "~/utils/types";
 
 
@@ -163,69 +162,78 @@ export const exampleRouter = createTRPCRouter({
             room: z.string(),
         })
     ).mutation(async ({ctx, input}) => {
-        const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Token ${process.env.REPLICATE_API_KEY ?? ""}`,
-            },
-            body: JSON.stringify({
-                version: process.env.REPLICATE_MODEL_VERSION,
-                input: {
-                    image: input.image_url,
-                    prompt:
-                        input.room === "Gaming Room"
-                            ? "a room for gaming with gaming computers, gaming consoles, and gaming chairs"
-                            : `a ${input.theme.toLowerCase()} ${input.room.toLowerCase()}`,
-                    a_prompt:
-                        "best quality, extremely detailed, photo from Pinterest, interior, cinematic photo, ultra-detailed, ultra-realistic, award-winning",
-                    n_prompt:
-                        "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
-                },
-            }),
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const jsonStartResponse = await startResponse.json();
-        console.log(jsonStartResponse);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-        const endpointUrl = jsonStartResponse.urls.get;
-        let restoredImage: string | null = null;
-        while (!restoredImage) {
-            // Loop in 1s intervals until the alt text is ready
-            console.log("waiting for result...");
-            const finalResponse = await fetch(endpointUrl as string, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Token ${process.env.REPLICATE_API_KEY ?? ""}`,
-                },
-            });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const jsonFinalResponse = await finalResponse.json();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            if (jsonFinalResponse.status === "succeeded") {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-                restoredImage = jsonFinalResponse.output[1];
-                await ctx.sdk.database.createDocument(
-                    process.env.ROOMS_DATABASE_ID as string,
-                    process.env.AI_ROOMS_COLLECTION_ID as string,
-                    ID.unique(),
-                    {
-                        user_id: input.user_id as string,
-                        user_image_url: input.image_url,
-                        createdAt: new Date().toISOString(),
-                        input_prompt: `A ${input.theme} ${input.room}`,
-                        generated_image_url: restoredImage,
-                    }
-                );
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            } else if (jsonFinalResponse.status === "failed") {
-                break;
-            } else {
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-            }
-        }
-        return restoredImage;
+        const result = await ctx.sdk.functions.createExecution("648a4c57583f5861837e", JSON.stringify({
+            user_id: input.user_id as string,
+            image_url: input.image_url,
+            theme: input.theme,
+            room: input.room,
+        }));
+        const status = result.response;
+        console.log(result);
+        return status;
+        // const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //         Authorization: `Token ${process.env.REPLICATE_API_KEY ?? ""}`,
+        //     },
+        //     body: JSON.stringify({
+        //         version: process.env.REPLICATE_MODEL_VERSION,
+        //         input: {
+        //             image: input.image_url,
+        //             prompt:
+        //                 input.room === "Gaming Room"
+        //                     ? "a room for gaming with gaming computers, gaming consoles, and gaming chairs"
+        //                     : `a ${input.theme.toLowerCase()} ${input.room.toLowerCase()}`,
+        //             a_prompt:
+        //                 "best quality, extremely detailed, photo from Pinterest, interior, cinematic photo, ultra-detailed, ultra-realistic, award-winning",
+        //             n_prompt:
+        //                 "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
+        //         },
+        //     }),
+        // });
+        //
+        // // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // const jsonStartResponse = await startResponse.json();
+        // console.log(jsonStartResponse);
+        // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+        // const endpointUrl = jsonStartResponse.urls.get;
+        // let restoredImage: string | null = null;
+        // while (!restoredImage) {
+        //     // Loop in 1s intervals until the alt text is ready
+        //     console.log("waiting for result...");
+        //     const finalResponse = await fetch(endpointUrl as string, {
+        //         method: "GET",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             Authorization: `Token ${process.env.REPLICATE_API_KEY ?? ""}`,
+        //         },
+        //     });
+        //     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        //     const jsonFinalResponse = await finalResponse.json();
+        //     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        //     if (jsonFinalResponse.status === "succeeded") {
+        //         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+        //         restoredImage = jsonFinalResponse.output[1];
+        //         await ctx.sdk.database.createDocument(
+        //             process.env.ROOMS_DATABASE_ID as string,
+        //             process.env.AI_ROOMS_COLLECTION_ID as string,
+        //             ID.unique(),
+        //             {
+        //                 user_id: input.user_id as string,
+        //                 user_image_url: input.image_url,
+        //                 createdAt: new Date().toISOString(),
+        //                 input_prompt: `A ${input.theme} ${input.room}`,
+        //                 generated_image_url: restoredImage,
+        //             }
+        //         );
+        //         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        //     } else if (jsonFinalResponse.status === "failed") {
+        //         break;
+        //     } else {
+        //         await new Promise((resolve) => setTimeout(resolve, 1000));
+        //     }
+        // }
+        // return restoredImage;
     }),
 });

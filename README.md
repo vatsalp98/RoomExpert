@@ -1,28 +1,77 @@
-# Create T3 App
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+# <div align="center">Room Expert</div>
 
-## What's next? How do I make an app with this?
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+<div align="center" style="font-weight:bold">Revamp Your Space, Embrace Your Taste</div>
+</br>
+<div align="center"><img src ="logo.png" style="vertical-align:middle; border-radius:100%; width:150px; height:150px"></div>
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+# Table of Content:
 
-## Learn More
+- [Watch on YouTube](#watch-our-video)
+- [Display Shots](#display-shots)
+- [Programming Language used ](#programming-language-used)
+- [Contact info](#contact-info)
+- [Member List and github repo](#member-list-and-github-repos)
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## Watch our video
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+## Display shots
 
-## How do I deploy this?
+<div align="center"><img src ="landing.png" width=600" height="300"></div>  
+<div align="center"><img src ="generated.png" width="600" height="400"></div>  
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+
+# Programming language used
+
+Room Expert has been built using the robust T3 Tech Stack and Appwrite for backend operations. The following services from Appwrite have been leveraged:
+
+**Appwrite Auth**: This has been used for handling user authentication.
+
+**Appwrite Database:** All the relevant data, such as user information and room design preferences, are stored here.
+
+**Appwrite Storage**: This service is used to securely store images uploaded by the users.
+
+Room Expert uses a state-of-the-art **machine learning model called ControlNet**. This model is responsible for generating different variations of the rooms according to the chosen styles. It intelligently considers the spatial characteristics and furniture arrangements to offer the most fitting design suggestions.
+
+The **ControlNet model is hosted on Replicate**, which allows us to efficiently manage, version, and deploy the model in production.
+
+
+
+
+
+
+## Try on the website
+
+```
+
+```
+
+
+
+# Future Scope 
+- Better our detection for products used to style the room to provide affiliate links to Amazon.
+- Make UI more user friendly
+- Add more styles to choose from
+
+ 
+ # Contact info 
+ 
+ ```
+vparmar@sfu.ca
+ ```
+ 
+ ```
+ aashishvichare10@gmail.com
+ ```
+
+ 
+ # Member list and Github repos
+ - Aashish :  https://github.com/AshCatchEmAll
+ - Vatsal : https://github.com/vatsalp98
+
+
+ 
+

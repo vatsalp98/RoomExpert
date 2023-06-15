@@ -19,7 +19,7 @@ import {
     type UploadProps
 } from "antd";
 import type {RcFile} from "antd/es/upload";
-import {ID, Storage} from "appwrite";
+import {Functions, ID, Storage} from "appwrite";
 import Head from "next/head";
 import React, {useState} from "react";
 import Image from "next/image";
@@ -89,6 +89,7 @@ const optionsRoomThemes: SelectProps['options'] = [
 
 export default function DashboardPage() {
     const storage = new Storage(client);
+    const functions = new Functions(client);
     const router = useRouter();
     const [previewImage, setPreviewImage] = useState('');
     const [messageApi, contextHolder] = message.useMessage();
@@ -168,13 +169,27 @@ export default function DashboardPage() {
         data: products,
     } = api.example.getRelatedProducts.useMutation();
 
-    const handleGenerate = () => {
-        generateImage({
-            image_url: previewImage,
-            room: roomType,
-            theme: roomTheme,
-            user_id: user_id ?? "uid",
+    const handleGenerate = async () => {
+        // const promise = await functions.createExecution(process.env.NEXT_PUBLIC_FUNCTION_ID as string, JSON.stringify({
+        //     image_url: previewImage,
+        //     room: roomType,
+        //     theme: roomTheme,
+        //     user_id: user_id ?? "uid",
+        // }));
+        // console.log(promise.response);
+        // return promise.response;
+
+        const promise = await fetch(`https://av2ulocs2k.execute-api.ca-central-1.amazonaws.com/default/room_expert_api?user_id=${user_id as string}&image_url=${previewImage}&room=${roomType}&theme=${roomTheme}`, {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+            },
+            mode: "no-cors",
         });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const result = promise.text();
+        console.log(result);
+        // return result;
     }
 
     const uploadButton = (
@@ -392,10 +407,12 @@ export default function DashboardPage() {
                                                 itemLayout="horizontal"
                                                 dataSource={products?.products}
                                                 renderItem={(item, index) => (
-                                                    <List.Item extra={<Image src={item.img} height={150} width={150}
+                                                    <List.Item key={index}
+                                                               extra={<Image src={item.img} height={150} width={150}
                                                                              alt={"Product Image"}/>}
                                                     >
                                                         <List.Item.Meta
+                                                            key={index}
                                                             title={<a href={item.img}>{item.title}</a>}
                                                             description={item.price}
                                                         />

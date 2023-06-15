@@ -2,7 +2,7 @@ import {initTRPC, TRPCError} from "@trpc/server";
 import {type CreateNextContextOptions} from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import {ZodError} from "zod";
-import {Account, Client, Databases, Graphql, Storage, Users} from "node-appwrite";
+import {Account, Client, Databases, Functions, Graphql, Storage, Users} from "node-appwrite";
 
 const createInnerTRPCContext = () => {
     const client = new Client()
@@ -17,6 +17,7 @@ const createInnerTRPCContext = () => {
     const users = new Users(client);
     const storage = new Storage(client);
     const graphql = new Graphql(client);
+    const functions = new Functions(client);
 
     return {
         sdk: {
@@ -25,6 +26,7 @@ const createInnerTRPCContext = () => {
             users,
             storage,
             graphql,
+            functions,
         },
     };
 };
