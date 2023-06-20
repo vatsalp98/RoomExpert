@@ -5,7 +5,7 @@ import {env} from "~/env.mjs";
 import {TRPCError} from "@trpc/server";
 import type {RcFile} from "antd/es/upload";
 import {Query} from "appwrite";
-import {detectedObject, Product} from "~/utils/types";
+import {type detectedObject, type Product} from "~/utils/types";
 
 
 export const exampleRouter = createTRPCRouter({
@@ -32,7 +32,7 @@ export const exampleRouter = createTRPCRouter({
 
     listRoomsRecords: appWriteProcedure.input(
         z.object({
-            user_id: z.any(),
+            user_id: z.string(),
         })
     ).query(async ({ctx, input}) => {
 
@@ -40,7 +40,7 @@ export const exampleRouter = createTRPCRouter({
             env.ROOMS_DATABASE_ID,
             env.AI_ROOMS_COLLECTION_ID,
             [
-                Query.equal('user_id', input.user_id as string),
+                Query.equal('user_id', input.user_id),
             ]
         );
     }),
@@ -156,21 +156,41 @@ export const exampleRouter = createTRPCRouter({
 
     generate: appWriteProcedure.input(
         z.object({
-            user_id: z.any(),
+            user_id: z.string(),
             image_url: z.string(),
             theme: z.string(),
             room: z.string(),
         })
     ).mutation(async ({ctx, input}) => {
-        const result = await ctx.sdk.functions.createExecution("648a4c57583f5861837e", JSON.stringify({
-            user_id: input.user_id as string,
-            image_url: input.image_url,
-            theme: input.theme,
-            room: input.room,
-        }));
-        const status = result.response;
-        console.log(result);
-        return status;
+        const result = await ctx.sdk.replicate.predictions.create({
+            version: "854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b",
+            webhook_events_filter: ['completed'],
+            webhook: "https://ca69-142-58-216-147.ngrok.io/api/webhook?user_id=" + input.user_id,
+            input: {
+                image: input.image_url,
+                prompt:
+                    input.room === "Gaming Room"
+                        ? "a room for gaming with gaming computers, gaming consoles, and gaming chairs"
+                        : `a ${input.theme.toLowerCase()} ${input.room.toLowerCase()}`,
+                a_prompt:
+                    "best quality, extremely detailed, photo from Pinterest, interior, cinematic photo, ultra-detailed, ultra-realistic, award-winning",
+                n_prompt:
+                    "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
+            },
+        });
+        if (result.status == "starting") {
+            return result.id;
+        }
+
+        // const result = await ctx.sdk.functions.createExecution("648a4c57583f5861837e", JSON.stringify({
+        //     user_id: input.user_id as string,
+        //     image_url: input.image_url,
+        //     theme: input.theme,
+        //     room: input.room,
+        // }));
+        // const status = result.response;
+        // console.log(result);
+        // return status;
         // const startResponse = await fetch("https://api.replicate.com/v1/predictions", {
         //     method: "POST",
         //     headers: {

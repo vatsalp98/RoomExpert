@@ -12,3 +12,29 @@ export interface Product {
     price: string,
     title: string,
 }
+
+export interface Prediction {
+    "id": string,
+    "version": string,
+    "urls": {
+        "get": string,
+        "cancel": string
+    },
+    "created_at": string,
+    "started_at": string,
+    "completed_at": string,
+    "source": string,
+    "status": string,
+    "input": {
+        "prompt": string,
+        "a_prompt": string,
+        "image": string,
+        "n_prompt": string,
+    },
+    "output": string[],
+    "error": string,
+    "logs": string,
+    "metrics": {
+        "predict_time": number
+    }
+}

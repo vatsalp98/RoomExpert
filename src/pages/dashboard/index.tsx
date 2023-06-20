@@ -6,18 +6,7 @@ import {
     SaveOutlined,
     ShopOutlined
 } from "@ant-design/icons";
-import {
-    Button,
-    List,
-    message,
-    Modal,
-    Select,
-    type  SelectProps,
-    Space,
-    Upload,
-    type UploadFile,
-    type UploadProps
-} from "antd";
+import {Button, List, message, Modal, Select, type  SelectProps, Upload, type UploadFile, type UploadProps} from "antd";
 import type {RcFile} from "antd/es/upload";
 import {Functions, ID, Storage} from "appwrite";
 import Head from "next/head";
@@ -102,7 +91,7 @@ export default function DashboardPage() {
         data: previousRooms,
         isLoading: previousLoading,
     } = api.example.listRoomsRecords.useQuery({
-        user_id: user_id,
+        user_id: user_id as string,
     });
 
 
@@ -169,27 +158,13 @@ export default function DashboardPage() {
         data: products,
     } = api.example.getRelatedProducts.useMutation();
 
-    const handleGenerate = async () => {
-        // const promise = await functions.createExecution(process.env.NEXT_PUBLIC_FUNCTION_ID as string, JSON.stringify({
-        //     image_url: previewImage,
-        //     room: roomType,
-        //     theme: roomTheme,
-        //     user_id: user_id ?? "uid",
-        // }));
-        // console.log(promise.response);
-        // return promise.response;
-
-        const promise = await fetch(`https://av2ulocs2k.execute-api.ca-central-1.amazonaws.com/default/room_expert_api?user_id=${user_id as string}&image_url=${previewImage}&room=${roomType}&theme=${roomTheme}`, {
-            method: "POST",
-            headers: {
-                "content-type": "application/json",
-            },
-            mode: "no-cors",
+    const handleGenerate = () => {
+        generateImage({
+            image_url: previewImage,
+            room: roomType,
+            theme: roomTheme,
+            user_id: user_id as string,
         });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const result = promise.text();
-        console.log(result);
-        // return result;
     }
 
     const uploadButton = (
@@ -226,13 +201,6 @@ export default function DashboardPage() {
             object: object,
         });
     }
-
-    const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
-        <Space>
-            {React.createElement(icon)}
-            {text}
-        </Space>
-    );
 
     return (
         <>
@@ -340,7 +308,7 @@ export default function DashboardPage() {
                                             <LoadingSpinner/>
                                         </div>
                                     }
-                                    {!generateLoading && !generatedImage &&
+                                    {!generateLoading &&
                                         <div className={"border rounded-lg p-10"}>
                                             <PictureOutlined className={"text-5xl"}/>
                                             <p className={"pt-2 font-semibold "}>
@@ -351,9 +319,9 @@ export default function DashboardPage() {
                                     {
                                         generatedImage &&
                                         <div className={"border rounded-lg p-10"}>
-                                            <a href={generatedImage} target={"_blank"}>
+                                            <a href={""} target={"_blank"}>
                                                 <Image alt={"generated Image"}
-                                                       src={generatedImage}
+                                                       src={""}
                                                        width={500} height={500}/>
                                             </a>
                                         </div>

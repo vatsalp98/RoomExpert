@@ -1,4 +1,4 @@
-import {Button, Form, Input, message} from "antd";
+import {Button, Form, Input, message, Result} from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import {Account} from "appwrite";
@@ -14,6 +14,7 @@ import {useState} from "react";
 export default function SigninPage() {
     const [messageApi, contextHolder] = message.useMessage();
     const router = useRouter();
+    const [isSucess, setSucess] = useState(false);
     const account = new Account(client);
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
@@ -27,6 +28,7 @@ export default function SigninPage() {
             function (response) {
                 form.resetFields();
                 setLoading(false);
+                setSucess(true);
                 if (response.userId) {
                     void router.push({pathname: "/dashboard", query: {user_id: response.userId}});
                 }
@@ -64,7 +66,7 @@ export default function SigninPage() {
                         </h2>
                         <div className={"text-white pt-1"}>
                             {
-                                !(loading) && <Form
+                                !(loading) && !isSucess && <Form
                                     form={form}
                                     labelCol={{span: 24}}
                                     wrapperCol={{span: 24}}
@@ -100,6 +102,15 @@ export default function SigninPage() {
                                         </Button>
                                     </Form.Item>
                                 </Form>
+                            }
+                            {
+                                !loading && isSucess && <div>
+                                    <Result
+                                        status="success"
+                                        title="Successfully Authenticated!"
+                                        subTitle="Redirecting to the dashboard, please wait."
+                                    />
+                                </div>
                             }
                         </div>
                         {

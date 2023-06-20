@@ -5,9 +5,11 @@ import {client} from "~/utils/utils";
 import {Account, type AppwriteException} from "appwrite";
 import {useRouter} from "next/router";
 import {useGetUser} from "~/utils/hooks/useGetUser";
+import {useState} from "react";
 
 export default function Header() {
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
     const account = new Account(client);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const [{user, isLoading}] = useGetUser();
@@ -26,13 +28,16 @@ export default function Header() {
                 <div>
                     {
                         user && <Button type={"primary"} danger icon={<LogoutOutlined/>} onClick={() => {
+                            setLoading(true);
                             const promise = account.deleteSessions();
                             promise.then(function () {
+                                setLoading(false);
                                 void router.push('/');
                             }, function (error: AppwriteException) {
+                                setLoading(false);
                                 void messageApi.error(error.message);
                             });
-                        }} loading={isLoading as boolean}>
+                        }} loading={loading}>
                             Logout
                         </Button>
                     }

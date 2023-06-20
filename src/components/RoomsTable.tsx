@@ -37,7 +37,7 @@ const columns: ColumnsType<Models.Document> = [
         title: "Generated Image",
         key: "generated_image",
         render: (_, record) => (
-            <Space>
+            <Space key={record.$id}>
                 <Popover title={"Generated Image"}
                          content={PopoverContent(record, false)}>
                     {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
