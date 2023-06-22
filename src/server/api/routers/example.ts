@@ -148,7 +148,7 @@ export const exampleRouter = createTRPCRouter({
         void ctx.sdk.replicate.predictions.create({
             version: "854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b",
             webhook_events_filter: ['completed'],
-            webhook: `${env.VERCEL_URL}?user_id=` + input.user_id,
+            webhook: `https://room-expert.vercel.app/?user_id=` + input.user_id,
             input: {
                 image: input.image_url,
                 prompt:
