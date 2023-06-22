@@ -143,8 +143,8 @@ export const exampleRouter = createTRPCRouter({
             theme: z.string(),
             room: z.string(),
         })
-    ).mutation(async ({ctx, input}) => {
-        const result = await ctx.sdk.replicate.predictions.create({
+    ).mutation(({ctx, input}) => {
+        const result = ctx.sdk.replicate.predictions.create({
             version: "854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b",
             webhook_events_filter: ['completed'],
             webhook: `${env.VERCEL_URL}?user_id=` + input.user_id,
@@ -159,9 +159,8 @@ export const exampleRouter = createTRPCRouter({
                 n_prompt:
                     "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
             },
+        }).then(response => {
+            return response.id;
         });
-        if (result.status == "starting") {
-            return result.id;
-        }
     }),
 });
