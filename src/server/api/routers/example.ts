@@ -162,6 +162,11 @@ export const exampleRouter = createTRPCRouter({
             },
         }).then(response => {
             return response.id;
+        }).then(error => {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: error,
+            });
         });
     }),
 });
