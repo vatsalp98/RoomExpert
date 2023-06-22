@@ -4,7 +4,6 @@ import superjson from "superjson";
 import {ZodError} from "zod";
 import {Account, Client, Databases, Functions, Graphql, Storage, Users} from "node-appwrite";
 import Replicate from "replicate";
-import {env} from "~/env.mjs";
 
 const createInnerTRPCContext = () => {
     const client = new Client()
@@ -15,7 +14,7 @@ const createInnerTRPCContext = () => {
         );
 
     const replicate = new Replicate({
-        auth: env.REPLICATE_API_KEY,
+        auth: "r8_XChZ5CdezZl5o4CfGVmEztalZ8UXCkk1KUX1k",
     });
 
     const account = new Account(client);
