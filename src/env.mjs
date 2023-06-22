@@ -12,6 +12,7 @@ export const env = createEnv({
         PROJECT_ID: z.string().min(1),
         AI_ROOMS_COLLECTION_ID: z.string().min(1),
         ROOMS_DATABASE_ID: z.string().min(1),
+        VERCEL_URL: z.string().min(1),
     },
 
     /**
@@ -38,6 +39,7 @@ export const env = createEnv({
         PROJECT_ID: process.env.PROJECT_ID,
         AI_ROOMS_COLLECTION_ID: process.env.AI_ROOMS_COLLECTION_ID,
         ROOMS_DATABASE_ID: process.env.ROOMS_DATABASE_ID,
+        VERCEL_URL: process.env.VERCEL_URL,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

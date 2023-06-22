@@ -21,5 +21,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         createdAt: response.created_at,
         input_prompt: response.input.prompt,
     });
-    return res.status(200).json({id: promise.$id});
+    return res.status(200).json(promise);
 }

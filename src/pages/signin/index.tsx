@@ -93,7 +93,7 @@ export default function SigninPage() {
                                     </Form.Item>
                                     <Form.Item className="flex justify-center">
                                         <Button
-                                            type="primary"
+                                            type="default"
                                             htmlType="submit"
                                             className={`px-8 pb-8 rounded text-lg font-bold ${loading ? 'opacity-50' : ''}`}
                                             loading={loading}

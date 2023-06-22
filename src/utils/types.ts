@@ -13,6 +13,15 @@ export interface Product {
     title: string,
 }
 
+export interface GeneratedRoom {
+    id: string,
+    createdAt: string,
+    user_id: string,
+    input_prompt: string,
+    generated_image_url: string,
+    user_image_url: string,
+}
+
 export interface Prediction {
     "id": string,
     "version": string,
