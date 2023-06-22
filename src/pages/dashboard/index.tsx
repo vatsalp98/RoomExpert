@@ -167,6 +167,10 @@ export default function DashboardPage() {
     } = api.example.getRelatedProducts.useMutation();
 
     const handleGenerate = () => {
+        console.log("INPUTS")
+        console.log(previewImage)
+        console.log(roomType)
+        console.log(roomTheme)
         generateImage({
             image_url: previewImage,
             room: roomType,
