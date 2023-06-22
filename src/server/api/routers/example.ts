@@ -144,7 +144,7 @@ export const exampleRouter = createTRPCRouter({
             room: z.string(),
         })
     ).mutation(({ctx, input}) => {
-        const result = ctx.sdk.replicate.predictions.create({
+        void ctx.sdk.replicate.predictions.create({
             version: "854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b",
             webhook_events_filter: ['completed'],
             webhook: `${env.VERCEL_URL}?user_id=` + input.user_id,
