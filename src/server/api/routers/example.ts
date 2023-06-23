@@ -143,30 +143,30 @@ export const exampleRouter = createTRPCRouter({
             theme: z.string(),
             room: z.string(),
         })
-    ).mutation(({ctx, input}) => {
-        console.log(`${env.VERCEL_URL}?user_id=` + input.user_id)
-        void ctx.sdk.replicate.predictions.create({
-            version: "854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b",
-            webhook_events_filter: ['completed'],
-            webhook: `https://room-expert.vercel.app/?user_id=` + input.user_id,
-            input: {
-                image: input.image_url,
-                prompt:
-                    input.room === "Gaming Room"
-                        ? "a room for gaming with gaming computers, gaming consoles, and gaming chairs"
-                        : `a ${input.theme.toLowerCase()} ${input.room.toLowerCase()}`,
-                a_prompt:
-                    "best quality, extremely detailed, photo from Pinterest, interior, cinematic photo, ultra-detailed, ultra-realistic, award-winning",
-                n_prompt:
-                    "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
-            },
-        }).then(response => {
-            return response.id;
-        }).then(error => {
+    ).mutation(async ({ctx, input}) => {
+        try {
+            const result = await ctx.sdk.replicate.predictions.create({
+                version: "854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b",
+                webhook_events_filter: ['completed'],
+                webhook: `https://room-expert.vercel.app/?user_id=` + input.user_id,
+                input: {
+                    image: input.image_url,
+                    prompt:
+                        input.room === "Gaming Room"
+                            ? "a room for gaming with gaming computers, gaming consoles, and gaming chairs"
+                            : `a ${input.theme.toLowerCase()} ${input.room.toLowerCase()}`,
+                    a_prompt:
+                        "best quality, extremely detailed, photo from Pinterest, interior, cinematic photo, ultra-detailed, ultra-realistic, award-winning",
+                    n_prompt:
+                        "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
+                },
+            });
+            return result.id;
+        } catch (error) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
-                message: error,
+                message: error as string,
             });
-        });
+        }
     }),
 });
