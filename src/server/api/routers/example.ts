@@ -88,7 +88,7 @@ export const exampleRouter = createTRPCRouter({
             image_url: z.string(),
         })
     ).mutation(async ({input}) => {
-        const url = 'https://appwrite-hackathon.gottacatchemall.repl.co/get_product';
+        const url = env.PRODUCTS_API_ENDPOINT;
         const json_payload = {
             "image_url": input.image_url,
             "detected_object": input.object as detectedObject,
@@ -115,7 +115,7 @@ export const exampleRouter = createTRPCRouter({
     getObjects: appWriteProcedure.input(z.object({
         image_url: z.string(),
     })).mutation(async ({input}) => {
-        const url = "https://api.edenai.run/v2/image/object_detection"
+        const url = env.OBJECTS_API;
         const json_payload = {"providers": "clarifai", "file_url": input.image_url};
         const headers = {
             "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmNlODAwNDQtMmZmMS00Y2E5LTljMjQtN2MwNDQ3MjM5NmM3IiwidHlwZSI6ImFwaV90b2tlbiJ9.bVY2wCx8_-ee-iRos77yHHi8lFNwwQJEX7GoZhdoiD0`,
@@ -146,9 +146,9 @@ export const exampleRouter = createTRPCRouter({
     ).mutation(async ({ctx, input}) => {
         try {
             const result = await ctx.sdk.replicate.predictions.create({
-                version: "854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56472a247b",
+                version: env.REPLICATE_MODEL_VERSION,
                 webhook_events_filter: ['completed'],
-                webhook: `https://room-expert.vercel.app/api/webhook?user_id=` + input.user_id,
+                webhook: `${env.VERCEL_URL}/api/webhook?user_id=` + input.user_id,
                 input: {
                     image: input.image_url,
                     prompt:
